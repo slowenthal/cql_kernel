@@ -4,11 +4,11 @@ import os
 
 #from IPython.
 
-_TEXT_SAVED_IMAGE = "bash_kernel: saved image data to:"
+_TEXT_SAVED_IMAGE = "cql_kernel: saved image data to:"
 
 image_setup_cmd = """
 display () {
-    TMPFILE=$(mktemp ${TMPDIR-/tmp}/bash_kernel.XXXXXXXXXX)
+    TMPFILE=$(mktemp ${TMPDIR-/tmp}/cql_kernel.XXXXXXXXXX)
     cat > $TMPFILE
     echo "%s $TMPFILE" >&2
 }

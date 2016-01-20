@@ -19,8 +19,8 @@ from .images import (
 )
 
 
-class BashKernel(Kernel):
-    implementation = 'bash_kernel'
+class CQLKernel(Kernel):
+    implementation = 'cql_kernel'
     implementation_version = __version__
 
     @property
@@ -33,10 +33,10 @@ class BashKernel(Kernel):
     @property
     def banner(self):
         if self._banner is None:
-            self._banner = check_output(['bash', '--version']).decode('utf-8')
+            self._banner = check_output(['CQL', '--version']).decode('utf-8')
         return self._banner
 
-    language_info = {'name': 'bash',
+    language_info = {'name': 'CQL',
                      'codemirror_mode': 'shell',
                      'mimetype': 'text/x-sh',
                      'file_extension': '.sh'}
@@ -56,7 +56,7 @@ class BashKernel(Kernel):
         finally:
             signal.signal(signal.SIGINT, sig)
 
-        # Register Bash function to write image data to temporary file
+        # Register CQL function to write image data to temporary file
         self.bashwrapper.run_command(image_setup_cmd)
 
     def do_execute(self, code, silent, store_history=True,
@@ -74,7 +74,7 @@ class BashKernel(Kernel):
             self.bashwrapper._expect_prompt()
             output = self.bashwrapper.child.before
         except EOF:
-            output = self.bashwrapper.child.before + 'Restarting Bash'
+            output = self.bashwrapper.child.before + 'Restarting CQL'
             self._start_bash()
 
         if not silent:

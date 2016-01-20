@@ -4,8 +4,8 @@ This requires IPython 3.
 
 To install::
 
-    pip install bash_kernel
-    python -m bash_kernel.install
+    pip install cql_kernel
+    python -m cql_kernel.install
 
 To use it, run one of:
 
