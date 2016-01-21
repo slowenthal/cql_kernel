@@ -57,8 +57,8 @@ class CQLKernel(Kernel):
         c = Cluster(["localhost"])
         self.cqlshell = Shell("127.0.0.1", 9042, use_conn = c )
         self.cqlshell.use_paging = False
-        self.outputString = StringIO.StringIO()
-        self.cqlshell.query_out = self.outputString
+        self.outputStringWriter = StringIO.StringIO()
+        self.cqlshell.query_out = self.outputStringWriter
 
         setup_cqlruleset(cql3handling)
 
@@ -73,8 +73,8 @@ class CQLKernel(Kernel):
             return {'status': 'ok', 'execution_count': self.execution_count,
                     'payload': [], 'user_expressions': {}}
 
-        self.outputString.truncate(0)
-        self.cqlshell.perform_statement(code)
+        self.outputStringWriter.truncate(0)
+        self.cqlshell.onecmd(code)
 
         # print(self.outputString.getvalue())
 
@@ -86,7 +86,12 @@ class CQLKernel(Kernel):
             # Send standard output
             # stream_content = {'name': 'stdout', 'text': self.outputString.getvalue()}
             # self.send_response(self.iopub_socket, 'stream', stream_content)
-            stream_content = {'execution_count': 5, 'data': {'text/html':  self.outputString.getvalue()}}
+            outputStr = self.outputStringWriter.getvalue()
+            if outputStr[:2] == '\n<':
+                stream_content = {'execution_count': 5, 'data': {'text/html': outputStr}}
+            else:
+                stream_content = {'execution_count': 5, 'data': {'text/plain': outputStr}}
+
             self.send_response(self.iopub_socket, 'execute_result', stream_content)
 
         #     # Send images, if any
