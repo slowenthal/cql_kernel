@@ -4,11 +4,9 @@ cqlkernel = CQLKernel.instance()
 
 
 # foo = cqlkernel.do_execute("select * from system.local xxx;", False)
-foo = cqlkernel.do_execute("select * from system.local;", False)
-foo = cqlkernel.do_execute("describe keyspace retail;", False)
-
+foo = cqlkernel.cqlshell.onecmd("help;")
+foo = cqlkernel.cqlshell.onecmd("select * from system.localsdf;")
 foo = cqlkernel.cqlshell.onecmd("describe keyspace retail;")
-foo = cqlkernel.cqlshell.onecmd("select * from system.local;")
 
 x = 10
 

@@ -2,7 +2,8 @@ import StringIO
 from ipykernel.kernelbase import Kernel
 from pexpect import replwrap, EOF
 from cassandra.cluster import Cluster
-from cqlsh import setup_cqlruleset
+# from cqlsh import setup_cqlruleset
+import cqlsh
 from cqlshlib import cql3handling
 
 from subprocess import check_output
@@ -59,8 +60,10 @@ class CQLKernel(Kernel):
         self.cqlshell.use_paging = False
         self.outputStringWriter = StringIO.StringIO()
         self.cqlshell.query_out = self.outputStringWriter
+        self.cqlshell.stdout = self.outputStringWriter
 
-        setup_cqlruleset(cql3handling)
+        cqlsh.setup_cqlruleset(cql3handling)
+        cqlsh.setup_cqldocs(cql3handling)
 
         # cql3handling
         pass
