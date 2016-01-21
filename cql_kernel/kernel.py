@@ -72,12 +72,20 @@ class CQLKernel(Kernel):
                    user_expressions=None, allow_stdin=False):
 
 
-        if not code.strip():
+        cleanCode = code.strip()
+
+        if not cleanCode:
             return {'status': 'ok', 'execution_count': self.execution_count,
                     'payload': [], 'user_expressions': {}}
+        print code
+        print cleanCode
+
+        if cleanCode[-1] != ';':
+            cleanCode += ";"
 
         self.outputStringWriter.truncate(0)
-        self.cqlshell.onecmd(code)
+        self.cqlshell.onecmd(cleanCode)
+
 
         # print(self.outputString.getvalue())
 
