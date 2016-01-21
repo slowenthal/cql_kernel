@@ -1,7 +1,13 @@
+import StringIO
 from ipykernel.kernelbase import Kernel
 from pexpect import replwrap, EOF
+from cassandra.cluster import Cluster
+from cqlsh import setup_cqlruleset
+from cqlshlib import cql3handling
 
 from subprocess import check_output
+from cqlsh import Shell
+
 from os import unlink
 
 import base64
@@ -23,6 +29,7 @@ class CQLKernel(Kernel):
     implementation = 'cql_kernel'
     implementation_version = __version__
 
+
     @property
     def language_version(self):
         m = version_pat.search(self.banner)
@@ -43,71 +50,69 @@ class CQLKernel(Kernel):
 
     def __init__(self, **kwargs):
         Kernel.__init__(self, **kwargs)
-        self._start_bash()
+        self._start_cql()
 
-    def _start_bash(self):
-        # Signal handlers are inherited by forked processes, and we can't easily
-        # reset it from the subprocess. Since kernelapp ignores SIGINT except in
-        # message handlers, we need to temporarily reset the SIGINT handler here
-        # so that bash and its children are interruptible.
-        sig = signal.signal(signal.SIGINT, signal.SIG_DFL)
-        try:
-            self.bashwrapper = replwrap.bash()
-        finally:
-            signal.signal(signal.SIGINT, sig)
 
-        # Register CQL function to write image data to temporary file
-        self.bashwrapper.run_command(image_setup_cmd)
+    def _start_cql(self):
+        c = Cluster(["localhost"])
+        self.cqlshell = Shell("127.0.0.1", 9042, use_conn = c )
+        self.cqlshell.use_paging = False
+        self.outputString = StringIO.StringIO()
+        self.cqlshell.query_out = self.outputString
+
+        setup_cqlruleset(cql3handling)
+
+        # cql3handling
+        pass
 
     def do_execute(self, code, silent, store_history=True,
                    user_expressions=None, allow_stdin=False):
+
+
         if not code.strip():
             return {'status': 'ok', 'execution_count': self.execution_count,
                     'payload': [], 'user_expressions': {}}
 
+        self.outputString.truncate(0)
+        self.cqlshell.perform_statement(code)
+
+        # print(self.outputString.getvalue())
+
         interrupted = False
-        try:
-            output = self.bashwrapper.run_command(code.rstrip(), timeout=None)
-        except KeyboardInterrupt:
-            self.bashwrapper.child.sendintr()
-            interrupted = True
-            self.bashwrapper._expect_prompt()
-            output = self.bashwrapper.child.before
-        except EOF:
-            output = self.bashwrapper.child.before + 'Restarting CQL'
-            self._start_bash()
 
         if not silent:
-            image_filenames, output = extract_image_filenames(output)
+            # image_filenames, output = extract_image_filenames(output)
 
             # Send standard output
-            stream_content = {'name': 'stdout', 'text': output}
-            self.send_response(self.iopub_socket, 'stream', stream_content)
+            # stream_content = {'name': 'stdout', 'text': self.outputString.getvalue()}
+            # self.send_response(self.iopub_socket, 'stream', stream_content)
+            stream_content = {'execution_count': 5, 'data': {'text/html':  self.outputString.getvalue()}}
+            self.send_response(self.iopub_socket, 'execute_result', stream_content)
 
-            # Send images, if any
-            for filename in image_filenames:
-                try:
-                    data = display_data_for_image(filename)
-                except ValueError as e:
-                    message = {'name': 'stdout', 'text': str(e)}
-                    self.send_response(self.iopub_socket, 'stream', message)
-                else:
-                    self.send_response(self.iopub_socket, 'display_data', data)
-
-        if interrupted:
-            return {'status': 'abort', 'execution_count': self.execution_count}
-
-        try:
-            exitcode = int(self.bashwrapper.run_command('echo $?').rstrip())
-        except Exception:
-            exitcode = 1
-
-        if exitcode:
-            return {'status': 'error', 'execution_count': self.execution_count,
-                    'ename': '', 'evalue': str(exitcode), 'traceback': []}
-        else:
-            return {'status': 'ok', 'execution_count': self.execution_count,
-                    'payload': [], 'user_expressions': {}}
+        #     # Send images, if any
+        #     for filename in image_filenames:
+        #         try:
+        #             data = display_data_for_image(filename)
+        #         except ValueError as e:
+        #             message = {'name': 'stdout', 'text': str(e)}
+        #             self.send_response(self.iopub_socket, 'stream', message)
+        #         else:
+        #             self.send_response(self.iopub_socket, 'display_data', data)
+        #
+        # if interrupted:
+        #     return {'status': 'abort', 'execution_count': self.execution_count}
+        #
+        # try:
+        #     exitcode = int(self.bashwrapper.run_command('echo $?').rstrip())
+        # except Exception:
+        #     exitcode = 1
+        #
+        # if exitcode:
+        #     return {'status': 'error', 'execution_count': self.execution_count,
+        #             'ename': '', 'evalue': str(exitcode), 'traceback': []}
+        # else:
+        #     return {'status': 'ok', 'execution_count': self.execution_count,
+        #             'payload': [], 'user_expressions': {}}
 
     def do_complete(self, code, cursor_pos):
         code = code[:cursor_pos]
