@@ -1333,8 +1333,8 @@ class Shell(cmd.Cmd):
         if ksname is None:
             for k in self.get_keyspaces():
                 name = protect_name(k.name)
-                print 'Keyspace %s' % (name,)
-                print '---------%s' % ('-' * len(name))
+                self.stdout.write( 'Keyspace %s' % (name,) + '\n')
+                self.stdout.write( '---------%s' % ('-' * len(name))  + '\n')
                 cmd.Cmd.columnize(self, protect_names(self.get_columnfamily_names(k.name)))
                 print
         else:
@@ -1346,8 +1346,8 @@ class Shell(cmd.Cmd):
         if ksname is None:
             for ksmeta in self.get_keyspaces():
                 name = protect_name(ksmeta.name)
-                print 'Keyspace %s' % (name,)
-                print '---------%s' % ('-' * len(name))
+                self.stdout.write( 'Keyspace %s' % (name,)  + '\n')
+                self.stdout.write( '---------%s' % ('-' * len(name))  + '\n')
                 cmd.Cmd.columnize(self, protect_names(ksmeta.user_types.keys()))
                 print
         else:
@@ -1364,21 +1364,21 @@ class Shell(cmd.Cmd):
             usertype = ksmeta.user_types[typename]
         except KeyError:
             raise UserTypeNotFound("User type %r not found" % typename)
-        print usertype.as_cql_query(formatted=True)
+        self.stdout.write( usertype.as_cql_query(formatted=True)  + '\n')
         print
 
     def describe_cluster(self):
-        print '\nCluster: %s' % self.get_cluster_name()
+        self.stdout.write( '\nCluster: %s' % self.get_cluster_name()   + '\n')
         p = trim_if_present(self.get_partitioner(), 'org.apache.cassandra.dht.')
-        print 'Partitioner: %s\n' % p
+        self.stdout.write( 'Partitioner: %s\n' % p    + '\n')
         # TODO: snitch?
         # snitch = trim_if_present(self.get_snitch(), 'org.apache.cassandra.locator.')
         # print 'Snitch: %s\n' % snitch
         if self.current_keyspace is not None and self.current_keyspace != 'system':
-            print "Range ownership:"
+            self.stdout.write( "Range ownership:"  + '\n')
             ring = self.get_ring(self.current_keyspace)
             for entry in ring.items():
-                print ' %39s  [%s]' % (str(entry[0].value), ', '.join([host.address for host in entry[1]]))
+                self.stdout.write( ' %39s  [%s]' % (str(entry[0].value), ', '.join([host.address for host in entry[1]])) + '\n')
             print
 
     def describe_schema(self, include_system=False):
@@ -1550,7 +1550,7 @@ class Shell(cmd.Cmd):
         cleancopyoptvals = [optval.decode('string-escape') for optval in copyoptvals]
         opts = dict(zip(copyoptnames, cleancopyoptvals))
 
-        print "\nStarting copy of %s.%s with columns %s." % (ks, cf, columns)
+        self.stdout.write( "\nStarting copy of %s.%s with columns %s." % (ks, cf, columns) + '\n')
 
         timestart = time.time()
 
@@ -1565,7 +1565,7 @@ class Shell(cmd.Cmd):
             raise SyntaxError("Unknown direction %s" % direction)
 
         timeend = time.time()
-        print "\n%d rows %s in %s." % (rows, verb, describe_interval(timeend - timestart))
+        self.stdout.write( "\n%d rows %s in %s." % (rows, verb, describe_interval(timeend - timestart)) + '\n')
 
     def perform_csv_import(self, ks, cf, columns, fname, opts):
         csv_options, dialect_options, unrecognized_options = copy.parse_options(self, opts)
@@ -1577,7 +1577,7 @@ class Shell(cmd.Cmd):
 
         if fname is None:
             do_close = False
-            print "[Use \. on a line by itself to end input]"
+            self.stdout.write( "[Use \. on a line by itself to end input]"  + '\n')
             linesource = self.use_stdin_reader(prompt='[copy] ', until=r'\.')
         else:
             do_close = True
@@ -2049,11 +2049,11 @@ class Shell(cmd.Cmd):
         """
         level = parsed.get_binding('level')
         if level is None:
-            print 'Current serial consistency level is %s.' % (cassandra.ConsistencyLevel.value_to_name[self.serial_consistency_level])
+            self.stdout.write( 'Current serial consistency level is %s.' % (cassandra.ConsistencyLevel.value_to_name[self.serial_consistency_level]) + '\n')
             return
 
         self.serial_consistency_level = cassandra.ConsistencyLevel.name_to_value[level.upper()]
-        print 'Serial consistency level set to %s.' % (level.upper(),)
+        self.stdout.write( 'Serial consistency level set to %s.' % (level.upper(),)  + '\n')
 
     def do_login(self, parsed):
         """
@@ -2195,11 +2195,11 @@ class SwitchCommand(object):
         switch = parsed.get_binding('switch')
         if switch is None:
             if state:
-                print "%s is currently enabled. Use %s OFF to disable" \
-                      % (self.description, self.command)
+                self.stdout.write( "%s is currently enabled. Use %s OFF to disable" \
+                      % (self.description, self.command) + '\n')
             else:
-                print "%s is currently disabled. Use %s ON to enable." \
-                      % (self.description, self.command)
+                self.stdout.write( "%s is currently disabled. Use %s ON to enable." \
+                      % (self.description, self.command) + '\n')
             return state
 
         if switch.upper() == 'ON':
@@ -2207,14 +2207,14 @@ class SwitchCommand(object):
                 printerr('%s is already enabled. Use %s OFF to disable.'
                          % (self.description, self.command))
                 return state
-            print 'Now %s is enabled' % (self.description,)
+            self.stdout.write( 'Now %s is enabled' % (self.description,) + '\n')
             return True
 
         if switch.upper() == 'OFF':
             if not state:
                 printerr('%s is not enabled.' % (self.description,))
                 return state
-            print 'Disabled %s.' % (self.description,)
+            self.stdout.write( 'Disabled %s.' % (self.description,) + '\n')
             return False
 
 
