@@ -92,16 +92,16 @@ class CQLKernel(Kernel):
         interrupted = False
 
         if not silent:
-            # image_filenames, output = extract_image_filenames(output)
 
-            # Send standard output
-            # stream_content = {'name': 'stdout', 'text': self.outputString.getvalue()}
-            # self.send_response(self.iopub_socket, 'stream', stream_content)
             outputStr = self.outputStringWriter.getvalue()
+
+            # CQL rows come back as HTML
             if outputStr[:2] == '\n<':
-                stream_content = {'execution_count': 5, 'data': {'text/html': outputStr}}
+                mime_type = 'text/html'
             else:
-                stream_content = {'execution_count': 5, 'data': {'text/plain': outputStr}}
+                mime_type = 'text/plain'
+
+            stream_content = {'execution_count': self.execution_count, 'data': {mime_type: outputStr}}
 
             self.send_response(self.iopub_socket, 'execute_result', stream_content)
 
@@ -123,12 +123,14 @@ class CQLKernel(Kernel):
         # except Exception:
         #     exitcode = 1
         #
+
         # if exitcode:
         #     return {'status': 'error', 'execution_count': self.execution_count,
         #             'ename': '', 'evalue': str(exitcode), 'traceback': []}
         # else:
-        #     return {'status': 'ok', 'execution_count': self.execution_count,
-        #             'payload': [], 'user_expressions': {}}
+
+        return {'status': 'ok', 'execution_count': self.execution_count,
+                'payload': [], 'user_expressions': {}}
 
     def do_complete(self, code, cursor_pos):
         code = code[:cursor_pos]
