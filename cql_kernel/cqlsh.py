@@ -44,7 +44,9 @@ import platform
 import sys
 import time
 import traceback
+import urllib
 import warnings
+import cgi
 
 from StringIO import StringIO
 from contextlib import contextmanager
@@ -1191,7 +1193,7 @@ class Shell(cmd.Cmd):
 
         # print header
         self.writeresult('<table>')
-        header = '<tr>' + ' '.join("<th>%s</th>" % hdr.ljust(w, color=self.color) for (hdr, w) in zip(formatted_names, widths)) + '<tr>'
+        header = '<tr>' + ' '.join("<th>%s</th>" % cgi.escape(hdr.ljust(w, color=self.color)) for (hdr, w) in zip(formatted_names, widths)) + '<tr>'
         self.writeresult(' ' + header.rstrip())
         # stop if there are no rows
         if formatted_values is None:
@@ -1200,7 +1202,7 @@ class Shell(cmd.Cmd):
 
         # print row data
         for row in formatted_values:
-            line = '<tr>' + ' '.join("<td>%s</td>" % col.rjust(w, color=self.color) for (col, w) in zip(row, widths)) + '</tr>'
+            line = '<tr>' + ' '.join("<td>%s</td>" % cgi.escape(col.rjust(w, color=self.color)) for (col, w) in zip(row, widths)) + '</tr>'
             self.writeresult(' ' + line)
 
         self.writeresult("</table>")
