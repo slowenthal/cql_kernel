@@ -109,7 +109,7 @@ class CQLKernel(Kernel):
             #Format desc commands with codemirror (cool feature)
 
             if code.strip()[:4] == 'desc':
-                outputStr = '<script>var x = CodeMirror.fromTextArea(document.getElementById("desc%d"), {mode:"text/x-cassandra"} )</script><textarea id="desc%d">%s</textarea>' % (self.execution_count, self.execution_count,outputStr)
+                outputStr = '<script>var x = CodeMirror.fromTextArea(document.getElementById("desc%d"), {readOnly: true, mode:"text/x-cassandra"} )</script><textarea id="desc%d">%s</textarea>' % (self.execution_count, self.execution_count,outputStr)
 
             # CQL rows come back as HTML
 
