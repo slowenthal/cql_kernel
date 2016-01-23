@@ -104,10 +104,16 @@ class CQLKernel(Kernel):
 
         if not silent:
 
-            outputStr = self.outStringWriter.getvalue()
+            outputStr = self.outStringWriter.getvalue().strip()
+
+            #Format desc commands with codemirror (cool feature)
+
+            if code.strip()[:4] == 'desc':
+                outputStr = '<script>var x = CodeMirror.fromTextArea(document.getElementById("desc%d"), {mode:"text/x-cassandra"} )</script><textarea id="desc%d">%s</textarea>' % (self.execution_count, self.execution_count,outputStr)
 
             # CQL rows come back as HTML
-            if outputStr[:2] == '\n<':
+
+            if outputStr[:1] == '<':
                 mime_type = 'text/html'
             else:
                 mime_type = 'text/plain'
