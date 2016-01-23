@@ -2168,6 +2168,10 @@ class Shell(cmd.Cmd):
             return text
         return color + text + ANSI_RESET
 
+    # def writeresult(self, text, color=None, newline=True, out=None):
+    #     if out is None:
+    #         out = self.query_out
+    #     out.write(self.applycolor(str(text), color) + ('\n' if newline else ''))
     def writeresult(self, text, color=None, newline=True, out=None):
         if out is None:
             out = self.query_out
@@ -2182,7 +2186,7 @@ class Shell(cmd.Cmd):
             shownum = self.show_line_nums
         if shownum:
             text = '%s:%d:%s' % (self.stdin.name, self.lineno, text)
-        self.writeresult(text, color, newline=newline, out=sys.stderr)
+        self.writeresult('<span style="color:DarkRed">%s</span>' % text, color, newline=newline, out=sys.stderr)
 
 
 class SwitchCommand(object):
