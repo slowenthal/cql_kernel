@@ -150,7 +150,7 @@ class CQLKernel(Kernel):
                 'payload': [], 'user_expressions': {}}
 
     def do_complete(self, code, cursor_pos):
-        code = code[:cursor_pos].strip()
+        code = code[:cursor_pos]
 
         default = {'matches': [], 'cursor_start': 0,
                    'cursor_end': cursor_pos, 'metadata': dict(),
@@ -159,7 +159,16 @@ class CQLKernel(Kernel):
         # if not code or code[-1] == ' ':
         #     return default
         #
-        matches = cql3handling.CqlRuleSet.cql_complete(code, "", cassandra_conn=self.cqlshell,
+
+        if code[-1:] in ('.','(','<'):
+            completed=code
+            partial = ''
+        else:
+            index = code.rfind(' ')
+            completed = code[:index+1]
+            partial = code[index+1:]
+
+        matches = cql3handling.CqlRuleSet.cql_complete(completed, partial, cassandra_conn=self.cqlshell,
                                                    startsymbol='cqlshCommand')
 
         if not matches:
@@ -169,7 +178,7 @@ class CQLKernel(Kernel):
         if not tokens:
             return default
 
-        return {'matches': sorted(matches), 'cursor_start': cursor_pos,
+        return {'matches': sorted(matches), 'cursor_start': cursor_pos - len(partial),
                 'cursor_end': cursor_pos, 'metadata': dict(),
                 'status': 'ok'}
 
