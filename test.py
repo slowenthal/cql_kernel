@@ -9,6 +9,8 @@ cqlkernel = CQLKernel.instance()
 foo = CqlRuleSet.cql_complete("CREATE", "", cassandra_conn=cqlkernel,
                                            startsymbol='cqlshCommand')
 
+
+
 foo = cqlkernel.cqlshell.onecmd("consistency quorum;")
 foo = cqlkernel.cqlshell.onecmd("help;")
 foo = cqlkernel.cqlshell.onecmd("select * from system.localsdf;")

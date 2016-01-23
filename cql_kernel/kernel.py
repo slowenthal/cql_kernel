@@ -3,6 +3,7 @@ from ipykernel.kernelbase import Kernel
 from pexpect import replwrap, EOF
 from cassandra.cluster import Cluster
 # from cqlsh import setup_cqlruleset
+import sys
 import cqlsh
 from cqlshlib import cql3handling
 
@@ -39,16 +40,20 @@ class CQLKernel(Kernel):
 
     _banner = None
 
+    # TODO
     @property
     def banner(self):
-        if self._banner is None:
-            self._banner = check_output(['CQL', '--version']).decode('utf-8')
+        # if self._banner is None:
+        #     self._banner = check_output(['CQL', '--version']).decode('utf-8')
+        # Todo get right version
+
+        self._banner = "CQL Version x"
         return self._banner
 
     language_info = {'name': 'CQL',
-                     'codemirror_mode': 'shell',
-                     'mimetype': 'text/x-sh',
-                     'file_extension': '.sh'}
+                     'codemirror_mode': 'sql',
+                     'mimetype': 'text/x-cassandra',
+                     'file_extension': '.cql'}
 
     def __init__(self, **kwargs):
         Kernel.__init__(self, **kwargs)
@@ -59,9 +64,9 @@ class CQLKernel(Kernel):
         c = Cluster(["localhost"])
         self.cqlshell = Shell("127.0.0.1", 9042, use_conn = c )
         self.cqlshell.use_paging = False
-        self.outputStringWriter = StringIO.StringIO()
-        self.cqlshell.query_out = self.outputStringWriter
-        self.cqlshell.stdout = self.outputStringWriter
+        self.outStringWriter = StringIO.StringIO()
+        self.cqlshell.query_out = self.outStringWriter
+        self.cqlshell.stdout = self.outStringWriter
 
         cqlsh.setup_cqlruleset(cql3handling)
         cqlsh.setup_cqldocs(cql3handling)
@@ -78,23 +83,28 @@ class CQLKernel(Kernel):
         if not cleanCode:
             return {'status': 'ok', 'execution_count': self.execution_count,
                     'payload': [], 'user_expressions': {}}
-        print code
-        print cleanCode
 
         if cleanCode[-1] != ';':
             cleanCode += ";"
 
-        self.outputStringWriter.truncate(0)
+        self.outStringWriter.truncate(0)
+
+        old_stdout = sys.stdout
+        old_stderr = sys.stderr
+        sys.stdout = self.outStringWriter
+        sys.stderr = self.outStringWriter
+
         self.cqlshell.onecmd(cleanCode)
 
+        sys.stdout = old_stdout
+        sys.stderr = old_stderr
 
-        # print(self.outputString.getvalue())
 
         interrupted = False
 
         if not silent:
 
-            outputStr = self.outputStringWriter.getvalue()
+            outputStr = self.outStringWriter.getvalue()
 
             # CQL rows come back as HTML
             if outputStr[:2] == '\n<':

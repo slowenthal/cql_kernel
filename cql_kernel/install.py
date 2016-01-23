@@ -8,7 +8,7 @@ from IPython.utils.tempdir import TemporaryDirectory
 kernel_json = {"argv":[sys.executable,"-m","cql_kernel", "-f", "{connection_file}"],
  "display_name":"CQL",
  "language":"CQL",
- "codemirror_mode":"shell",
+ "codemirror_mode":"sql",
  "env":{"PS1": "$"}
 }
 
