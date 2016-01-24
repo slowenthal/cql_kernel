@@ -4,7 +4,7 @@ setup(
     name='cql_kernel',
     version='0.1',
     packages=['cqlshlib', 'cqlshlib.test', 'cql_kernel'],
-    url='',
+    url='https://github.com/slowenthal/cql_kernel',
     license='Apache',
     author='Steven Lowenthal & Apache Cassandra Developers',
     author_email='steve@datastax.com',
