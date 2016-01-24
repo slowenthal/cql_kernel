@@ -1,6 +1,4 @@
-A simple IPython kernel for bash
-
-This requires IPython 3.
+A Jupyter kernel for the Apache Cassandra Database
 
 To install::
 
