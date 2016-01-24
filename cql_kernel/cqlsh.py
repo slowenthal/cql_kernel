@@ -180,7 +180,9 @@ parser.add_option("--connect-timeout", default=DEFAULT_CONNECT_TIMEOUT_SECONDS, 
                   help='Specify the connection timeout in seconds (default: %default seconds).')
 
 optvalues = optparse.Values()
-(options, arguments) = parser.parse_args(sys.argv[1:], values=optvalues)
+#(options, arguments) = parser.parse_args(sys.argv[1:], values=optvalues)
+options = None
+
 
 # BEGIN history/config definition
 HISTORY_DIR = os.path.expanduser(os.path.join('~', '.cassandra'))

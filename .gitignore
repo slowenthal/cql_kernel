@@ -1,5 +1,7 @@
 __pycache__
 *.pyc
+*.iml
+.idea/
 build/
 dist/
 MANIFEST

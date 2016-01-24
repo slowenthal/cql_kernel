@@ -1,4 +1,5 @@
 import StringIO
+import os
 from ipykernel.kernelbase import Kernel
 from pexpect import replwrap, EOF
 from cassandra.cluster import Cluster
@@ -57,11 +58,12 @@ class CQLKernel(Kernel):
 
     def __init__(self, **kwargs):
         Kernel.__init__(self, **kwargs)
+        self.hostname = os.environ.get('CASSANDRA_HOSTNAME','localhost')
         self._start_cql()
 
 
     def _start_cql(self):
-        c = Cluster(["localhost"])
+        c = Cluster([self.hostname])
         self.cqlshell = Shell("127.0.0.1", 9042, use_conn = c )
         self.cqlshell.use_paging = False
         self.outStringWriter = StringIO.StringIO()
@@ -99,9 +101,6 @@ class CQLKernel(Kernel):
         sys.stdout = old_stdout
         sys.stderr = old_stderr
 
-
-        interrupted = False
-
         if not silent:
 
             outputStr = self.outStringWriter.getvalue().strip()
@@ -121,25 +120,6 @@ class CQLKernel(Kernel):
             stream_content = {'execution_count': self.execution_count, 'data': {mime_type: outputStr}}
 
             self.send_response(self.iopub_socket, 'execute_result', stream_content)
-
-        #     # Send images, if any
-        #     for filename in image_filenames:
-        #         try:
-        #             data = display_data_for_image(filename)
-        #         except ValueError as e:
-        #             message = {'name': 'stdout', 'text': str(e)}
-        #             self.send_response(self.iopub_socket, 'stream', message)
-        #         else:
-        #             self.send_response(self.iopub_socket, 'display_data', data)
-        #
-        # if interrupted:
-        #     return {'status': 'abort', 'execution_count': self.execution_count}
-        #
-        # try:
-        #     exitcode = int(self.bashwrapper.run_command('echo $?').rstrip())
-        # except Exception:
-        #     exitcode = 1
-        #
 
         # if exitcode:
         #     return {'status': 'error', 'execution_count': self.execution_count,
