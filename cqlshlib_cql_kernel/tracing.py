@@ -14,7 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from cqlshlib.displaying import MAGENTA
+from .displaying import MAGENTA
 from datetime import datetime
 import time
 from cassandra.query import QueryTrace, TraceUnavailable
