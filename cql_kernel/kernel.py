@@ -1,33 +1,20 @@
 import StringIO
 import os
 from ipykernel.kernelbase import Kernel
-from pexpect import replwrap, EOF
 from cassandra.cluster import Cluster
+
 # from cqlsh import setup_cqlruleset
 import sys
 import cqlsh
 from cqlshlib import cql3handling
 
 
-from subprocess import check_output
 from cqlsh import Shell
-
-from os import unlink
-
-import base64
-import imghdr
 import re
-import signal
-import urllib
 
 __version__ = '0.2'
 
 version_pat = re.compile(r'version (\d+(\.\d+)+)')
-
-from .images import (
-    extract_image_filenames, display_data_for_image, image_setup_cmd
-)
-
 
 class CQLKernel(Kernel):
     implementation = 'cql_kernel'
