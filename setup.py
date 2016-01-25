@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='cql_kernel',
-    version='0.1.1',
+    version='0.2',
     packages=['cqlshlib_cql_kernel', 'cqlshlib_cql_kernel.test', 'cql_kernel'],
     url='https://github.com/slowenthal/cql_kernel',
     license='Apache',

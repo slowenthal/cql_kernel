@@ -127,13 +127,14 @@ class CQLKernel(Kernel):
         #     return default
         #
 
-        if code[-1:] in ('.','(','<'):
-            completed=code
-            partial = ''
-        else:
-            index = code.rfind(' ')
-            completed = code[:index+1]
-            partial = code[index+1:]
+        # Find the rightmost of blank, . , <, (
+
+        index = max(code.rfind(' '),
+            code.rfind('.'),
+            code.rfind('<'),
+            code.rfind('('))
+        completed = code[:index+1]
+        partial = code[index+1:]
 
         matches = cql3handling.CqlRuleSet.cql_complete(completed, partial, cassandra_conn=self.cqlshell,
                                                    startsymbol='cqlshCommand')
