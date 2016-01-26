@@ -5,11 +5,16 @@ import sys
 from jupyter_client.kernelspec import install_kernel_spec
 from IPython.utils.tempdir import TemporaryDirectory
 
+if len(sys.argv) > 1:
+    hostname = sys.argv[1]
+else:
+    hostname = 'localhost'
+
 kernel_json = {"argv":[sys.executable,"-m","cql_kernel", "-f", "{connection_file}"],
  "display_name":"CQL",
  "language":"CQL",
  "codemirror_mode":"sql",
- "env":{"PS1": "$"}
+ "env":{"CASSANDRA_HOSTNAME": hostname}
 }
 
 def install_my_kernel_spec(user=True):
@@ -19,7 +24,7 @@ def install_my_kernel_spec(user=True):
             json.dump(kernel_json, f, sort_keys=True)
         # TODO: Copy resources once they're specified
 
-        print('Installing IPython kernel spec')
+        print('Installing IPython kernel spec to connect to cassandra host "%s"' % hostname)
         install_kernel_spec(td, 'CQL', user=user, replace=True)
 
 def _is_root():
