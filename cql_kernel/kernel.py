@@ -73,24 +73,31 @@ class CQLKernel(Kernel):
             return {'status': 'ok', 'execution_count': self.execution_count,
                     'payload': [], 'user_expressions': {}}
 
-        if cleanCode[-1] != ';':
-            cleanCode += ";"
 
-        self.outStringWriter.truncate(0)
+        # Very very cheal HTML magic
+        if cleanCode[:6].upper() == "%%HTML":
+            outputStr = cleanCode[6:].strip()
+        else:
+            # This is a regular query
+            if cleanCode[-1] != ';':
+                cleanCode += ";"
 
-        old_stdout = sys.stdout
-        old_stderr = sys.stderr
-        sys.stdout = self.outStringWriter
-        sys.stderr = self.outStringWriter
+            self.outStringWriter.truncate(0)
 
-        self.cqlshell.onecmd(cleanCode)
 
-        sys.stdout = old_stdout
-        sys.stderr = old_stderr
+            old_stdout = sys.stdout
+            old_stderr = sys.stderr
+            sys.stdout = self.outStringWriter
+            sys.stderr = self.outStringWriter
+
+            self.cqlshell.onecmd(cleanCode)
+
+            sys.stdout = old_stdout
+            sys.stderr = old_stderr
+            outputStr = self.outStringWriter.getvalue().strip()
 
         if not silent:
 
-            outputStr = self.outStringWriter.getvalue().strip()
 
             #Format desc commands with codemirror (cool feature)
 
