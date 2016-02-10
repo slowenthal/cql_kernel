@@ -34,7 +34,5 @@ Pexpect's docs on the `replwrap module
 
 To build::
 
-```
-python setup.py sdist upload
-python setup.py bdist upload
-```
+    python setup.py sdist upload
+    python setup.py bdist upload
