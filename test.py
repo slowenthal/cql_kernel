@@ -1,3 +1,4 @@
+import sys
 from cql_kernel.kernel import CQLKernel
 from cqlshlib_cql_kernel.cql3handling import CqlRuleSet
 
@@ -48,6 +49,8 @@ print foo
 
 foo = cqlkernel.cqlshell.onecmd("consistency quorum;")
 foo = cqlkernel.cqlshell.onecmd("help;")
+cqlkernel.cqlshell.query_out = sys.stdout
+
 foo = cqlkernel.cqlshell.onecmd("select * from system.local;")
 foo = cqlkernel.cqlshell.onecmd("describe keyspace retail;")
 

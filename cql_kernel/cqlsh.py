@@ -48,6 +48,7 @@ from StringIO import StringIO
 from contextlib import contextmanager
 from glob import glob
 from uuid import UUID
+from .cql_html_format import print_formatted_result_html
 
 if sys.version_info[0] != 2 or sys.version_info[1] != 7:
     sys.exit("\nCQL Shell supports only Python 2.7\n")
@@ -1227,6 +1228,7 @@ class Shell(cmd.Cmd):
     def do_use(self, parsed):
         ksname = parsed.get_binding('ksname')
         success, _ = self.perform_simple_statement(SimpleStatement(parsed.extract_orig()))
+        success, _ = self.perform_simple_statement(SimpleStatement(parsed.extract_orig()))
         if success:
             if ksname[0] == '"' and ksname[-1] == '"':
                 self.current_keyspace = self.cql_unprotect_name(ksname)
@@ -1361,7 +1363,8 @@ class Shell(cmd.Cmd):
         if self.expand_enabled:
             self.print_formatted_result_vertically(formatted_names, formatted_values)
         else:
-            self.print_formatted_result(formatted_names, formatted_values)
+            print_formatted_result_html(self.writeresult, formatted_names, formatted_values, table_meta)   # TODO - inject writer
+
 
     def print_formatted_result(self, formatted_names, formatted_values):
         # determine column widths
