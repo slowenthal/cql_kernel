@@ -11,6 +11,6 @@ setup(
     tests_require = ['jupyter_kernel_test','nose>=1.3.7'],
     description='CQL Kernel for Jupyter based on cqlsh',
     package_data= {
-        '':['lib/*.zip']
+        '':['lib/*.zip','doc/cql3/*']
     }
 )
