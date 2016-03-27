@@ -1,4 +1,4 @@
-
+import cgi
 
 BLACK = 'black'
 GREEN = 'green'
@@ -44,7 +44,7 @@ def print_formatted_result_html(writeresult, formatted_names, formatted_values, 
 
     for row in formatted_values:
         writeresult('<tr><td>')
-        writeresult('</td><td>'.join(v.strval for v in row))
+        writeresult('</td><td>'.join(cgi.escape(v.strval) for v in row))
         writeresult('</td></tr>')
 
     writeresult('</table>')
