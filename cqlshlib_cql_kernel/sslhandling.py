@@ -22,7 +22,7 @@ import ssl
 
 def ssl_settings(host, config_file, env=os.environ):
     """
-    Function wcich generates SSL setting for cassandra.Cluster
+    Function which generates SSL setting for cassandra.Cluster
 
     Params:
     * host .........: hostname of Cassandra node.

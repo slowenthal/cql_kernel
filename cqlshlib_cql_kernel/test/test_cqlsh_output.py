@@ -21,16 +21,19 @@ from __future__ import with_statement
 
 import re
 from itertools import izip
-from .basecase import (BaseTestCase, cqlshlog, dedent, at_a_time, cqlsh,
-                       TEST_HOST, TEST_PORT)
+import unittest
+import sys
+
+from .basecase import (BaseTestCase, cqlshlog, dedent, at_a_time, TEST_HOST, TEST_PORT)
+from cql_kernel import cqlsh
 from .cassconnect import (get_test_keyspace, testrun_cqlsh, testcall_cqlsh,
                           cassandra_cursor, split_cql_commands, quote_name)
 from .ansi_colors import (ColoredText, lookup_colorcode, lookup_colorname,
                           lookup_colorletter, ansi_seq)
 
+
 CONTROL_C = '\x03'
 CONTROL_D = '\x04'
-
 
 class TestCqlshOutput(BaseTestCase):
 
@@ -92,7 +95,8 @@ class TestCqlshOutput(BaseTestCase):
     def test_no_color_output(self):
         for termname in ('', 'dumb', 'vt100'):
             cqlshlog.debug('TERM=%r' % termname)
-            with testrun_cqlsh(tty=True, env={'TERM': termname}) as c:
+            with testrun_cqlsh(tty=True, env={'TERM': termname},
+                               win_force_colors=False) as c:
                 c.send('select * from has_all_types;\n')
                 self.assertNoHasColors(c.read_to_next_prompt())
                 c.send('select count(*) from has_all_types;\n')
@@ -110,13 +114,14 @@ class TestCqlshOutput(BaseTestCase):
             for line in output:
                 self.assertNoHasColors(line)
                 self.assertNotRegexpMatches(line, r'^cqlsh\S*>')
-            self.assertTrue(6 <= len(output) <= 8,
-                            msg='output: %r' % '\n'.join(output))
+            self.assertEqual(len(output), 6,
+                             msg='output: %r' % '\n'.join(output))
             self.assertEqual(output[0], '')
             self.assertNicelyFormattedTableHeader(output[1])
             self.assertNicelyFormattedTableRule(output[2])
             self.assertNicelyFormattedTableData(output[3])
             self.assertEqual(output[4].strip(), '')
+            self.assertEqual(output[5].strip(), '(1 rows)')
 
     def test_color_output(self):
         for termname in ('xterm', 'unknown-garbage'):
@@ -175,7 +180,7 @@ class TestCqlshOutput(BaseTestCase):
              MMMMM
             -------
 
-                10
+                20
                 GG
 
 
@@ -274,9 +279,9 @@ class TestCqlshOutput(BaseTestCase):
         # same query should show up as empty in cql 3
         self.assertQueriesGiveColoredOutput((
             (q, """
-             num | asciicol | bigintcol | blobcol | booleancol | decimalcol | doublecol | floatcol | intcol | textcol | timestampcol | uuidcol | varcharcol | varintcol
-             RRR   MMMMMMMM   MMMMMMMMM   MMMMMMM   MMMMMMMMMM   MMMMMMMMMM   MMMMMMMMM   MMMMMMMM   MMMMMM   MMMMMMM   MMMMMMMMMMMM   MMMMMMM   MMMMMMMMMM   MMMMMMMMM
-            -----+----------+-----------+---------+------------+------------+-----------+----------+--------+---------+--------------+---------+------------+-----------
+             num | asciicol | bigintcol | blobcol | booleancol | decimalcol | doublecol | floatcol | intcol | smallintcol | textcol | timestampcol | tinyintcol | uuidcol | varcharcol | varintcol
+             RRR   MMMMMMMM   MMMMMMMMM   MMMMMMM   MMMMMMMMMM   MMMMMMMMMM   MMMMMMMMM   MMMMMMMM   MMMMMM   MMMMMMMMMMM   MMMMMMM   MMMMMMMMMMMM   MMMMMMMMMM   MMMMMMM   MMMMMMMMMM   MMMMMMMMM
+            -----+----------+-----------+---------+------------+------------+-----------+----------+--------+-------------+---------+--------------+------------+---------+------------+-----------
 
 
             (0 rows)
@@ -357,31 +362,34 @@ class TestCqlshOutput(BaseTestCase):
             ('''select timestampcol from has_all_types where num = 0;''', """
              timestampcol
              MMMMMMMMMMMM
-            --------------------------
+            ---------------------------------
 
-             2012-05-14 12:53:20+0000
-             GGGGGGGGGGGGGGGGGGGGGGGG
+             2012-05-14 12:53:20.000000+0000
+             GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG
 
 
             (1 rows)
             nnnnnnnn
             """),
         ), env={'TZ': 'Etc/UTC'})
+        try:
+            import pytz  # test only if pytz is available on PYTHONPATH
+            self.assertQueriesGiveColoredOutput((
+                ('''select timestampcol from has_all_types where num = 0;''', """
+                 timestampcol
+                 MMMMMMMMMMMM
+                ---------------------------------
 
-        self.assertQueriesGiveColoredOutput((
-            ('''select timestampcol from has_all_types where num = 0;''', """
-             timestampcol
-             MMMMMMMMMMMM
-            --------------------------
-
-             2012-05-14 07:53:20-0500
-             GGGGGGGGGGGGGGGGGGGGGGGG
+                 2012-05-14 09:53:20.000000-0300
+                 GGGGGGGGGGGGGGGGGGGGGGGGGGGGGGG
 
 
-            (1 rows)
-            nnnnnnnn
-            """),
-        ), env={'TZ': 'EST'})
+                (1 rows)
+                nnnnnnnn
+                """),
+            ), env={'TZ': 'America/Sao_Paulo'})
+        except ImportError:
+            pass
 
     def test_boolean_output(self):
         self.assertCqlverQueriesGiveColoredOutput((
@@ -540,9 +548,13 @@ class TestCqlshOutput(BaseTestCase):
             c.send('use NONEXISTENTKEYSPACE;\n')
             outputlines = c.read_to_next_prompt().splitlines()
 
-            self.assertEqual(outputlines[0], 'use NONEXISTENTKEYSPACE;')
-            self.assertTrue(outputlines[2].endswith('cqlsh:system> '))
-            midline = ColoredText(outputlines[1])
+            start_index = 0
+            if c.realtty:
+                self.assertEqual(outputlines[start_index], 'use NONEXISTENTKEYSPACE;')
+                start_index = 1
+
+            self.assertTrue(outputlines[start_index+1].endswith('cqlsh:system> '))
+            midline = ColoredText(outputlines[start_index])
             self.assertEqual(midline.plain(),
                              'InvalidRequest: code=2200 [Invalid query] message="Keyspace \'nonexistentkeyspace\' does not exist"')
             self.assertColorFromTags(midline,
@@ -601,16 +613,19 @@ class TestCqlshOutput(BaseTestCase):
                 doublecol double,
                 floatcol float,
                 intcol int,
+                smallintcol smallint,
                 textcol text,
                 timestampcol timestamp,
+                tinyintcol tinyint,
                 uuidcol uuid,
                 varcharcol text,
                 varintcol varint
             ) WITH bloom_filter_fp_chance = 0.01
-                AND caching = '{"keys":"ALL", "rows_per_partition":"NONE"}'
+                AND caching = {'keys': 'ALL', 'rows_per_partition': 'NONE'}
                 AND comment = ''
-                AND compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy'}
-                AND compression = {'sstable_compression': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+                AND compaction = {'class': 'org.apache.cassandra.db.compaction.SizeTieredCompactionStrategy', 'max_threshold': '32', 'min_threshold': '4'}
+                AND compression = {'chunk_length_in_kb': '64', 'class': 'org.apache.cassandra.io.compress.LZ4Compressor'}
+                AND crc_check_chance = 1.0
                 AND dclocal_read_repair_chance = 0.1
                 AND default_time_to_live = 0
                 AND gc_grace_seconds = 864000
@@ -618,7 +633,7 @@ class TestCqlshOutput(BaseTestCase):
                 AND memtable_flush_period_in_ms = 0
                 AND min_index_interval = 128
                 AND read_repair_chance = 0.0
-                AND speculative_retry = '99.0PERCENTILE';
+                AND speculative_retry = '99PERCENTILE';
 
         """ % quote_name(get_test_keyspace()))
 
@@ -728,6 +743,7 @@ class TestCqlshOutput(BaseTestCase):
             self.assertRegexpMatches(output, '^Connected to .* at %s:%d\.$'
                                              % (re.escape(TEST_HOST), TEST_PORT))
 
+    @unittest.skipIf(sys.platform == "win32", 'EOF signaling not supported on Windows')
     def test_eof_prints_newline(self):
         with testrun_cqlsh(tty=True) as c:
             c.send(CONTROL_D)
@@ -742,8 +758,9 @@ class TestCqlshOutput(BaseTestCase):
             with testrun_cqlsh(tty=True) as c:
                 cmd = 'exit%s\n' % semicolon
                 c.send(cmd)
-                out = c.read_lines(1)[0].replace('\r', '')
-                self.assertEqual(out, cmd)
+                if c.realtty:
+                    out = c.read_lines(1)[0].replace('\r', '')
+                    self.assertEqual(out, cmd)
                 with self.assertRaises(BaseException) as cm:
                     c.read_lines(1)
                 self.assertIn(type(cm.exception), (EOFError, OSError))

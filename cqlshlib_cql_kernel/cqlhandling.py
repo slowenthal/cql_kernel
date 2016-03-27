@@ -63,7 +63,7 @@ class CqlParsingRuleSet(pylexotron.ParsingRuleSet):
         We cannot let resreved cql keywords be simple 'identifier' since this caused
         problems with completion, see CASSANDRA-10415
         """
-        syntax = '<reserved_identifier> ::= /(' + '|'.join(r'\b%s\b' % (k,) for k in keywords) + ')/ ;'
+        syntax = '<reserved_identifier> ::= /(' + '|'.join(r'\b{}\b'.format(k) for k in keywords) + ')/ ;'
         self.append_rules(syntax)
 
     def completer_for(self, rulename, symname):
@@ -142,6 +142,7 @@ class CqlParsingRuleSet(pylexotron.ParsingRuleSet):
         stmts = util.split_list(tokens, lambda t: t[0] == 'endtoken')
         output = []
         in_batch = False
+        in_pg_string = len([st for st in tokens if len(st) > 0 and st[0] == 'unclosedPgString']) == 1
         for stmt in stmts:
             if in_batch:
                 output[-1].extend(stmt)
@@ -152,7 +153,7 @@ class CqlParsingRuleSet(pylexotron.ParsingRuleSet):
                     in_batch = False
                 elif stmt[0][1].upper() == 'BEGIN':
                     in_batch = True
-        return output, in_batch
+        return output, in_batch or in_pg_string
 
     def cql_complete_single(self, text, partial, init_bindings={}, ignore_case=True,
                             startsymbol='Start'):
@@ -306,7 +307,7 @@ class CqlParsingRuleSet(pylexotron.ParsingRuleSet):
                 first = first[:-1]
             if debug:
                 print "** Got a partial completion: %r." % (common_prefix,)
-            first += common_prefix
+            return first + common_prefix
         if debug:
             print "** New total completion: %r. Checking for further matches...\n" % (first,)
         return self.cql_complete_multiple(text, first, init_bindings, startsymbol=startsymbol)
@@ -321,7 +322,7 @@ class CqlParsingRuleSet(pylexotron.ParsingRuleSet):
         if tok[0] == 'unclosedName':
             # strip one quote
             return tok[1][1:].replace('""', '"')
-        if tok[0] == 'stringLiteral':
+        if tok[0] == 'quotedStringLiteral':
             # strip quotes
             return tok[1][1:-1].replace("''", "'")
         if tok[0] == 'unclosedString':

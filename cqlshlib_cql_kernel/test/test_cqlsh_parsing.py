@@ -17,24 +17,10 @@
 # to configure behavior, define $CQL_TEST_HOST to the destination address
 # for Thrift connections, and $CQL_TEST_PORT to the associated port.
 
-from .basecase import BaseTestCase
+from unittest import TestCase
 
 
-class TestCqlshCommands(BaseTestCase):
-    def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
-
-    def test_show(self):
-        pass
-
+class TestCqlshParsing(TestCase):
     def test_describe(self):
         pass
 
-    def test_exit(self):
-        pass
-
-    def test_help(self):
-        pass

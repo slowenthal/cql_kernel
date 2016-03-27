@@ -1,15 +1,15 @@
 import StringIO
+import codecs
 import os
-from ipykernel.kernelbase import Kernel
-from cassandra.cluster import Cluster
 
-# from cqlsh import setup_cqlruleset
+from ipykernel.kernelbase import Kernel
+
 import sys
-import cqlsh
+from cql_kernel import cqlsh
 from cqlshlib_cql_kernel import cql3handling
 
 
-from cqlsh import Shell
+from cql_kernel.cqlsh import Shell
 import re
 
 __version__ = '0.2'
@@ -50,8 +50,9 @@ class CQLKernel(Kernel):
 
 
     def _start_cql(self):
-        c = Cluster([self.hostname])
-        self.cqlshell = Shell("127.0.0.1", 9042, use_conn = c )
+        # c = Cluster([self.hostname])
+        # self.cqlshell = Shell("127.0.0.1", 9042, use_conn = c )
+        self.cqlshell = Shell("127.0.0.1", 9042, encoding="utf-8")
         self.cqlshell.use_paging = False
         self.outStringWriter = StringIO.StringIO()
         self.cqlshell.query_out = self.outStringWriter

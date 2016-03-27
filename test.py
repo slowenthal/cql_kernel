@@ -48,7 +48,7 @@ print foo
 
 foo = cqlkernel.cqlshell.onecmd("consistency quorum;")
 foo = cqlkernel.cqlshell.onecmd("help;")
-foo = cqlkernel.cqlshell.onecmd("select * from system.localsdf;")
+foo = cqlkernel.cqlshell.onecmd("select * from system.local;")
 foo = cqlkernel.cqlshell.onecmd("describe keyspace retail;")
 
 x = 10
