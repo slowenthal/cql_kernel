@@ -703,7 +703,7 @@ class Shell(cmd.Cmd):
                  protocol_version=DEFAULT_PROTOCOL_VERSION,
                  connect_timeout=DEFAULT_CONNECT_TIMEOUT_SECONDS):
         cmd.Cmd.__init__(self, completekey=completekey)
-        self.hostname = hostname
+        self.hostname = hostname.split(",")
         self.port = port
         self.auth_provider = None
         if username:
@@ -719,11 +719,11 @@ class Shell(cmd.Cmd):
         if use_conn:
             self.conn = use_conn
         else:
-            self.conn = Cluster(contact_points=(self.hostname,), port=self.port, cql_version=cqlver,
+            self.conn = Cluster(contact_points=self.hostname, port=self.port, cql_version=cqlver,
                                 protocol_version=protocol_version,
                                 auth_provider=self.auth_provider,
                                 ssl_options=sslhandling.ssl_settings(hostname, CONFIG_FILE) if ssl else None,
-                                load_balancing_policy=WhiteListRoundRobinPolicy([self.hostname]),
+                                load_balancing_policy=WhiteListRoundRobinPolicy(self.hostname),
                                 control_connection_timeout=connect_timeout,
                                 connect_timeout=connect_timeout)
         self.owns_connection = not use_conn
@@ -852,7 +852,7 @@ class Shell(cmd.Cmd):
     def show_host(self):
         print "Connected to %s at %s:%d." % \
             (self.applycolor(self.get_cluster_name(), BLUE),
-              self.hostname,
+              ",".join(self.hostname),
               self.port)
 
     def show_version(self):
@@ -1980,7 +1980,7 @@ class Shell(cmd.Cmd):
         except IOError, e:
             self.printerr('Could not open %r: %s' % (fname, e))
             return
-        subshell = Shell(self.hostname, self.port,
+        subshell = Shell(",".join(self.hostname), self.port,
                          color=self.color, encoding=self.encoding, stdin=f,
                          tty=False, use_conn=self.conn, cqlver=self.cql_version,
                          display_timestamp_format=self.display_timestamp_format,
@@ -2168,7 +2168,7 @@ class Shell(cmd.Cmd):
 
         auth_provider = PlainTextAuthProvider(username=username, password=password)
 
-        conn = Cluster(contact_points=(self.hostname,), port=self.port, cql_version=self.conn.cql_version,
+        conn = Cluster(contact_points=self.hostname, port=self.port, cql_version=self.conn.cql_version,
                        protocol_version=self.conn.protocol_version,
                        auth_provider=auth_provider,
                        ssl_options=self.conn.ssl_options,
