@@ -52,7 +52,7 @@ class CQLKernel(Kernel):
     def _start_cql(self):
         # c = Cluster([self.hostname])
         # self.cqlshell = Shell("127.0.0.1", 9042, use_conn = c )
-        self.cqlshell = Shell("127.0.0.1", 9042, encoding="utf-8")
+        self.cqlshell = Shell(self.hostname, 9042, encoding="utf-8")
         self.cqlshell.use_paging = False
         self.outStringWriter = StringIO.StringIO()
         self.cqlshell.query_out = self.outStringWriter
