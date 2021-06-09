@@ -18,12 +18,12 @@ import csv
 import json
 import multiprocessing as mp
 import os
-import Queue
+import queue
 import sys
 import time
 import traceback
 
-from StringIO import StringIO
+from io import StringIO
 from random import randrange
 from threading import Lock
 
@@ -33,9 +33,9 @@ from cassandra.policies import RetryPolicy, WhiteListRoundRobinPolicy, TokenAwar
 from cassandra.query import tuple_factory
 
 
-import sslhandling
-from displaying import NO_COLOR_MAP
-from formatting import format_value_default, EMPTY, get_formatter
+from . import sslhandling
+from .displaying import NO_COLOR_MAP
+from .formatting import format_value_default, EMPTY, get_formatter
 
 
 def parse_options(shell, opts):
@@ -115,7 +115,7 @@ class ExportTask(object):
             do_close = True
             try:
                 csvdest = open(fname, 'wb')
-            except IOError, e:
+            except IOError as e:
                 shell.printerr("Can't open %r for writing: %s" % (fname, e))
                 return 0
 
@@ -129,7 +129,7 @@ class ExportTask(object):
         inmsg = mp.Queue()
         outmsg = mp.Queue()
         processes = []
-        for i in xrange(num_processes):
+        for i in range(num_processes):
             process = ExportProcess(outmsg, inmsg, self.ks, self.cf, self.columns, self.dialect_options,
                                     self.csv_options, shell.debug, shell.port, shell.conn.cql_version,
                                     shell.auth_provider, shell.ssl, self.protocol_version, self.config_file)
@@ -172,7 +172,7 @@ class ExportTask(object):
             return ranges
 
         local_dc = shell.conn.metadata.get_host(hostname).datacenter
-        ring = shell.get_ring(self.ks).items()
+        ring = list(shell.get_ring(self.ks).items())
         ring.sort()
 
         previous_previous = None
@@ -234,7 +234,7 @@ class ExportTask(object):
         total_jobs = len(ranges)
         max_attempts = self.csv_options['maxattempts']
 
-        self.send_work(ranges, ranges.keys(), outmsg)
+        self.send_work(ranges, list(ranges.keys()), outmsg)
 
         num_processes = len(processes)
         succeeded = 0
@@ -264,7 +264,7 @@ class ExportTask(object):
                     csvdest.write(data)
                     meter.increment(n=num)
                     ranges[token_range]['rows'] += num
-            except Queue.Empty:
+            except queue.Empty:
                 pass
 
         if self.num_live_processes(processes) < len(processes):
@@ -455,7 +455,7 @@ class ExportProcess(mp.Process):
         self.attach_callbacks(token_range, future, session)
 
     def num_jobs(self):
-        return sum(session.num_jobs() for session in self.hosts_to_sessions.values())
+        return sum(session.num_jobs() for session in list(self.hosts_to_sessions.values()))
 
     def get_session(self, hosts):
         """
@@ -514,13 +514,13 @@ class ExportProcess(mp.Process):
             writer = csv.writer(output, **self.dialect_options)
 
             for row in rows:
-                writer.writerow(map(self.format_value, row))
+                writer.writerow(list(map(self.format_value, row)))
 
             data = (output.getvalue(), len(rows))
             self.outmsg.put((token_range, data))
             output.close()
 
-        except Exception, e:
+        except Exception as e:
             self.report_error(e, token_range)
 
     def format_value(self, val):
@@ -540,7 +540,7 @@ class ExportProcess(mp.Process):
         self.printmsg("Export process terminating...")
         self.inmsg.close()
         self.outmsg.close()
-        for session in self.hosts_to_sessions.values():
+        for session in list(self.hosts_to_sessions.values()):
             session.shutdown()
         self.printmsg("Export process terminated")
 

@@ -26,10 +26,10 @@ class CQLHelpTopics(object):
         getattr(self, 'help_' + topic.lower())()
 
     def help_types(self):
-        print "\n        CQL types recognized by this version of cqlsh:\n"
+        print("\n        CQL types recognized by this version of cqlsh:\n")
         for t in simple_cql_types:
-            print '          ' + t
-        print """
+            print('          ' + t)
+        print("""
         For information on the various recognizable input formats for these
         types, or on controlling the formatting of cqlsh query output, see
         one of the following topics:
@@ -41,10 +41,10 @@ class CQLHelpTopics(object):
 
           HELP TEXT_OUTPUT
           HELP TIMESTAMP_OUTPUT
-        """
+        """)
 
     def help_timestamp_input(self):
-        print """
+        print("""
         Timestamp input
 
         CQL supports any of the following ISO 8601 formats for timestamp
@@ -69,37 +69,37 @@ class CQLHelpTopics(object):
 
         If no time zone is supplied, the current time zone for the Cassandra
         server node will be used.
-        """
+        """)
 
     def help_blob_input(self):
-        print """
+        print("""
         Blob input
 
         CQL blob data must be specified in a string literal as hexidecimal
         data. Example: to store the ASCII values for the characters in the
         string "CQL", use '43514c'.
-        """
+        """)
 
     def help_uuid_input(self):
-        print """
+        print("""
         UUID input
 
         UUIDs may be specified in CQL using 32 hexidecimal characters,
         split up using dashes in the standard UUID format:
 
           XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
-        """
+        """)
 
     def help_boolean_input(self):
-        print """
+        print("""
         Boolean input
 
         CQL accepts the strings 'true' and 'false' (case insensitive)
         as input for boolean types.
-        """
+        """)
 
     def help_timestamp_output(self):
-        print """
+        print("""
         Timestamp output
 
         Cqlsh will display timestamps in the following format by default:
@@ -109,10 +109,10 @@ class CQLHelpTopics(object):
         which is a format acceptable as CQL timestamp input as well.
         The output format can be changed by setting 'time_format' property
         in the [ui] section of .cqlshrc file.
-        """
+        """)
 
     def help_text_output(self):
-        print """
+        print("""
         Textual output
 
         When control characters, or other characters which can't be encoded
@@ -126,11 +126,11 @@ class CQLHelpTopics(object):
         that non-ascii characters be shown with Python-style "\\uABCD"
         escape sequences, invoke cqlsh with an ASCII locale (for example,
         by setting the $LANG environment variable to "C").
-        """
+        """)
     help_ascii_output = help_text_output
 
     def help_create_index(self):
-        print """
+        print("""
         CREATE INDEX [<indexname>] ON <cfname> ( <colname> );
 
         A CREATE INDEX statement is used to create a new, automatic secondary
@@ -140,64 +140,64 @@ class CQLHelpTopics(object):
         necessary for the column to exist on any current rows (Cassandra is
         schema-optional), but the column must already have a type (specified
         during the CREATE TABLE, or added afterwards with ALTER TABLE).
-        """
+        """)
 
     def help_drop(self):
-        print """
+        print("""
         There are different variants of DROP. For more information, see
         one of the following:
 
           HELP DROP_KEYSPACE;
           HELP DROP_TABLE;
           HELP DROP_INDEX;
-        """
+        """)
 
     def help_drop_keyspace(self):
-        print """
+        print("""
         DROP KEYSPACE <keyspacename>;
 
         A DROP KEYSPACE statement results in the immediate, irreversible
         removal of a keyspace, including all column families in it, and all
         data contained in those column families.
-        """
+        """)
 
     def help_drop_table(self):
-        print """
+        print("""
         DROP TABLE <tablename>;
 
         A DROP TABLE statement results in the immediate, irreversible
         removal of a CQL table and the underlying column family, including all
         data contained in it.
-        """
+        """)
     help_drop_columnfamily = help_drop_table
 
     def help_drop_index(self):
-        print """
+        print("""
         DROP INDEX <indexname>;
 
         A DROP INDEX statement is used to drop an existing secondary index.
-        """
+        """)
 
     def help_truncate(self):
-        print """
+        print("""
         TRUNCATE <tablename>;
 
         TRUNCATE accepts a single argument for the table name, and permanently
         removes all data from it.
-        """
+        """)
 
     def help_create(self):
-        print """
+        print("""
         There are different variants of CREATE. For more information, see
         one of the following:
 
           HELP CREATE_KEYSPACE;
           HELP CREATE_TABLE;
           HELP CREATE_INDEX;
-        """
+        """)
 
     def help_use(self):
-        print """
+        print("""
         USE <keyspacename>;
 
         Tells cqlsh and the connected Cassandra instance that you will be
@@ -209,10 +209,10 @@ class CQLHelpTopics(object):
         As always, when a keyspace name does not work as a normal identifier or
         number, it can be quoted using single quotes (CQL 2) or double quotes
         (CQL 3).
-        """
+        """)
 
     def help_create_table(self):
-        print """
+        print("""
         CREATE TABLE <cfname> ( <colname> <type> PRIMARY KEY [,
                                 <colname> <type> [, ...]] )
                [WITH <optionname> = <val> [AND <optionname> = <val> [...]]];
@@ -234,11 +234,11 @@ class CQLHelpTopics(object):
 
           HELP CREATE_TABLE_TYPES;
           HELP CREATE_TABLE_OPTIONS;
-        """
+        """)
     help_create_columnfamily = help_create_table
 
     def help_compound_primary_keys(self):
-        print """
+        print("""
         CREATE TABLE <cfname> ( <partition_key> <type>, <clustering_key1> type, <clustering_key2> type,
                                 [, ...]], PRIMARY KEY (<partition_key>, <clustering_key1>, <clustering_key2>);
 
@@ -251,10 +251,10 @@ class CQLHelpTopics(object):
         phrase should be parenthesized, as
 
         PRIMARY KEY ((<partition_key_part1>, <partition_key_part2>), <clustering_key>)
-        """
+        """)
 
     def help_create_table_types(self):
-        print """
+        print("""
         CREATE TABLE: Specifying column types
 
           CREATE ... (KEY <type> PRIMARY KEY,
@@ -266,11 +266,11 @@ class CQLHelpTopics(object):
         column values correctly when receiving them. Column types are specified
         as a parenthesized, comma-separated list of column term and type pairs.
         See HELP TYPES; for the list of recognized types.
-        """
+        """)
     help_create_columnfamily_types = help_create_table_types
 
     def help_create_table_options(self):
-        print """
+        print("""
         CREATE TABLE: Specifying columnfamily options
 
           CREATE TABLE blah (...)
@@ -281,11 +281,11 @@ class CQLHelpTopics(object):
         row and key caches for the underlying Cassandra columnfamily. Consult
         your CQL reference for the complete list of options and possible
         values.
-        """
+        """)
     help_create_columnfamily_options = help_create_table_options
 
     def help_alter_alter(self):
-        print """
+        print("""
         ALTER TABLE: altering existing typed columns
 
           ALTER TABLE addamsFamily ALTER lastKnownLocation TYPE uuid;
@@ -297,10 +297,10 @@ class CQLHelpTopics(object):
         that column will remain unchanged, and if existing data is not
         deserializable according to the new type, this may cause your CQL
         driver or interface to report errors.
-        """
+        """)
 
     def help_alter_add(self):
-        print """
+        print("""
         ALTER TABLE: adding a typed column
 
           ALTER TABLE addamsFamily ADD gravesite varchar;
@@ -309,10 +309,10 @@ class CQLHelpTopics(object):
         family. The column must not already have a type in the column family
         metadata. See the warnings on HELP ALTER_ALTER regarding the lack of
         validation of existing data; they apply here as well.
-        """
+        """)
 
     def help_alter_drop(self):
-        print """
+        print("""
         ALTER TABLE: dropping a typed column
 
           ALTER TABLE addamsFamily DROP gender;
@@ -322,10 +322,10 @@ class CQLHelpTopics(object):
         column from current rows; it just removes the metadata saying that the
         bytes stored under that column are expected to be deserializable
         according to a certain type.
-        """
+        """)
 
     def help_alter_with(self):
-        print """
+        print("""
         ALTER TABLE: changing column family properties
 
           ALTER TABLE addamsFamily WITH comment = 'Glad to be here!'
@@ -335,10 +335,10 @@ class CQLHelpTopics(object):
         table properties, as defined when the table was created (see
         HELP CREATE_TABLE_OPTIONS and your Cassandra documentation for
         information about the supported parameter names and values).
-        """
+        """)
 
     def help_delete_columns(self):
-        print """
+        print("""
         DELETE: specifying columns
 
           DELETE col1, col2, col3 FROM ...
@@ -349,10 +349,10 @@ class CQLHelpTopics(object):
 
         When column names do not parse as valid CQL identifiers, they can be
         quoted in single quotes (CQL 2) or double quotes (CQL 3).
-        """
+        """)
 
     def help_delete_where(self):
-        print """
+        print("""
         DELETE: specifying rows
 
           DELETE ... WHERE keycol = 'some_key_value';
@@ -365,10 +365,10 @@ class CQLHelpTopics(object):
         multiple columns, values for each must be given). The second form
         allows a list of key values to be specified using the IN operator
         and a parenthesized list of comma-delimited key values.
-        """
+        """)
 
     def help_update_set(self):
-        print """
+        print("""
         UPDATE: Specifying Columns and Row
 
           UPDATE ... SET name1 = value1, name2 = value2
@@ -379,10 +379,10 @@ class CQLHelpTopics(object):
         Rows are created or updated by supplying column names and values in
         term assignment format.  Multiple columns can be set by separating the
         name/value pairs using commas.
-        """
+        """)
 
     def help_update_counters(self):
-        print """
+        print("""
         UPDATE: Updating Counter Columns
 
           UPDATE ... SET name1 = name1 + <value> ...
@@ -391,10 +391,10 @@ class CQLHelpTopics(object):
         Counter columns can be incremented or decremented by an arbitrary
         numeric value though the assignment of an expression that adds or
         subtracts the value.
-        """
+        """)
 
     def help_update_where(self):
-        print """
+        print("""
         UPDATE: Selecting rows to update
 
           UPDATE ... WHERE <keyname> = <keyval>;
@@ -406,10 +406,10 @@ class CQLHelpTopics(object):
 
         If the table's primary key consists of multiple columns, an explicit
         value must be given for each for the UPDATE statement to make sense.
-        """
+        """)
 
     def help_select_table(self):
-        print """
+        print("""
         SELECT: Specifying Table
 
           SELECT ... FROM [<keyspace>.]<tablename> ...
@@ -418,11 +418,11 @@ class CQLHelpTopics(object):
         query. The keyspace in which the table exists can optionally be
         specified along with the table name, separated by a dot (.). This will
         not change the current keyspace of the session (see HELP USE).
-        """
+        """)
     help_select_columnfamily = help_select_table
 
     def help_select_where(self):
-        print """
+        print("""
         SELECT: Filtering rows
 
           SELECT ... WHERE <key> = keyname AND name1 = value1
@@ -443,10 +443,10 @@ class CQLHelpTopics(object):
         ranges that are inclusive of the terms. There is no supported notion of
         "strictly" greater-than or less-than; these operators are merely
         supported as aliases to >= and <=.
-        """
+        """)
 
     def help_select_limit(self):
-        print """
+        print("""
         SELECT: Limiting results
 
           SELECT ... WHERE <clause> [LIMIT n] ...
@@ -454,13 +454,13 @@ class CQLHelpTopics(object):
         Limiting the number of rows returned can be achieved by adding the
         LIMIT option to a SELECT expression. LIMIT defaults to 10,000 when left
         unset.
-        """
+        """)
 
 
 class CQL3HelpTopics(CQLHelpTopics):
 
     def help_create_keyspace(self):
-        print """
+        print("""
         CREATE KEYSPACE <ksname>
             WITH replication = {'class':'<strategy>' [,'<option>':<val>]};
 
@@ -490,10 +490,10 @@ class CQL3HelpTopics(CQLHelpTopics):
          with a value of "3" you would use this statement:
             CREATE KEYSPACE <ksname>
                 WITH replication = {'class':'SimpleStrategy', 'replication_factor':3};
-        """
+        """)
 
     def help_begin(self):
-        print """
+        print("""
         BEGIN [UNLOGGED|COUNTER] BATCH [USING TIMESTAMP <timestamp>]
           <insert or update or delete statement> ;
           [ <another insert or update or delete statement ;
@@ -511,11 +511,11 @@ class CQL3HelpTopics(CQLHelpTopics):
 
         _NOTE: While there are no isolation guarantees, UPDATE queries are
         atomic within a given record._
-        """
+        """)
     help_apply = help_begin
 
     def help_select(self):
-        print """
+        print("""
         SELECT <selectExpr>
           FROM [<keyspace>.]<table>
             [WHERE <clause>]
@@ -531,10 +531,10 @@ class CQL3HelpTopics(CQLHelpTopics):
           HELP SELECT_TABLE
           HELP SELECT_WHERE
           HELP SELECT_LIMIT
-        """
+        """)
 
     def help_delete(self):
-        print """
+        print("""
         DELETE [<col1> [, <col2>, ...] FROM [<keyspace>.]<tablename>
                [USING TIMESTAMP <timestamp>]
             WHERE <keyname> = <keyvalue>;
@@ -548,10 +548,10 @@ class CQL3HelpTopics(CQLHelpTopics):
           HELP DELETE_USING
           HELP DELETE_COLUMNS
           HELP DELETE_WHERE
-        """
+        """)
 
     def help_delete_using(self):
-        print """
+        print("""
         DELETE: the USING clause
 
           DELETE ... USING TIMESTAMP <timestamp>;
@@ -560,10 +560,10 @@ class CQL3HelpTopics(CQLHelpTopics):
         record. It must be an integer. Cassandra timestamps are generally
         specified using milliseconds since the Unix epoch (1970-01-01 00:00:00
         UTC).
-        """
+        """)
 
     def help_update(self):
-        print """
+        print("""
         UPDATE [<keyspace>.]<columnFamily>
                               [USING [TIMESTAMP <timestamp>]
                                 [AND TTL <timeToLive>]]
@@ -584,10 +584,10 @@ class CQL3HelpTopics(CQLHelpTopics):
           HELP UPDATE_SET
           HELP UPDATE_COUNTERS
           HELP UPDATE_WHERE
-        """
+        """)
 
     def help_update_using(self):
-        print """
+        print("""
         UPDATE: the USING clause
 
           UPDATE ... USING TIMESTAMP <timestamp>;
@@ -605,10 +605,10 @@ class CQL3HelpTopics(CQLHelpTopics):
 
         <timeToLive> defines the optional time to live (TTL) in seconds for the
         new column value(s). It must be an integer.
-        """
+        """)
 
     def help_insert(self):
-        print """
+        print("""
         INSERT INTO [<keyspace>.]<tablename>
                     ( <colname1>, <colname2> [, <colname3> [, ...]] )
                VALUES ( <colval1>, <colval2> [, <colval3> [, ...]] )
@@ -630,10 +630,10 @@ class CQL3HelpTopics(CQLHelpTopics):
 
           HELP UPDATE
           HELP UPDATE_USING
-        """
+        """)
 
     def help_select_expr(self):
-        print """
+        print("""
         SELECT: Specifying Columns
 
           SELECT name1, name2, name3 FROM ...
@@ -652,10 +652,10 @@ class CQL3HelpTopics(CQLHelpTopics):
         value is the number of rows from the pre-aggregation resultset.
 
         Currently, COUNT is the only function supported by CQL.
-        """
+        """)
 
     def help_alter_drop(self):
-        print """
+        print("""
         ALTER TABLE: dropping a typed column
 
           ALTER TABLE addamsFamily DROP gender;
@@ -668,14 +668,14 @@ class CQL3HelpTopics(CQLHelpTopics):
         It is assumed that timestamps represent actual time, so if this
         is not your case, you should NOT readd previously dropped columns.
         Columns can't be dropped from tables defined with COMPACT STORAGE.
-        """
+        """)
 
     def help_create(self):
         super(CQL3HelpTopics, self).help_create()
-        print "          HELP CREATE_USER;\n"
+        print("          HELP CREATE_USER;\n")
 
     def help_alter(self):
-        print """
+        print("""
         ALTER TABLE <tablename> ALTER <columnname> TYPE <type>;
         ALTER TABLE <tablename> ADD <columnname> <type>;
         ALTER TABLE <tablename> RENAME <columnname> TO <columnname>
@@ -694,10 +694,10 @@ class CQL3HelpTopics(CQLHelpTopics):
           HELP ALTER_DROP;
           HELP ALTER_RENAME;
           HELP ALTER_WITH;
-        """
+        """)
 
     def help_alter_rename(self):
-        print """
+        print("""
         ALTER TABLE: renaming a column
 
           ALTER TABLE <tablename> RENAME <columnname> TO <columnname>
@@ -705,23 +705,23 @@ class CQL3HelpTopics(CQLHelpTopics):
 
         The ALTER TABLE ... RENAME variant renames a typed column in a column
         family.
-        """
+        """)
 
     def help_drop(self):
         super(CQL3HelpTopics, self).help_drop()
-        print "          HELP DROP_USER;\n"
+        print("          HELP DROP_USER;\n")
 
     def help_list(self):
-        print """
+        print("""
         There are different variants of LIST. For more information, see
         one of the following:
 
           HELP LIST_USERS;
           HELP LIST_PERMISSIONS;
-        """
+        """)
 
     def help_create_user(self):
-        print """
+        print("""
         CREATE USER <username> [WITH PASSWORD 'password'] [NOSUPERUSER | SUPERUSER];
 
         CREATE USER creates a new Cassandra user account.
@@ -730,10 +730,10 @@ class CQL3HelpTopics(CQLHelpTopics):
 
         WITH PASSWORD clause should only be used with password-based authenticators,
         e.g. PasswordAuthenticator, SimpleAuthenticator.
-        """
+        """)
 
     def help_alter_user(self):
-        print """
+        print("""
         ALTER USER <username> [WITH PASSWORD 'password'] [NOSUPERUSER | SUPERUSER];
 
         Use ALTER USER to change a user's superuser status and/or password (only
@@ -741,25 +741,25 @@ class CQL3HelpTopics(CQLHelpTopics):
         Superusers can change a user's password or superuser status (except their own).
         Users cannot change their own superuser status. Ordinary users can only change their
         password (if the configured authenticator is password-based).
-        """
+        """)
 
     def help_drop_user(self):
-        print """
+        print("""
         DROP USER <username>;
 
         DROP USER removes an existing user. You have to be logged in as a superuser
         to issue a DROP USER statement. A user cannot drop themselves.
-        """
+        """)
 
     def help_list_users(self):
-        print """
+        print("""
         LIST USERS;
 
         List existing users and their superuser status.
-        """
+        """)
 
     def help_grant(self):
-        print """
+        print("""
         GRANT (<permission> [PERMISSION] | ALL [PERMISSIONS])
                   ON ALL KEYSPACES
                    | KEYSPACE <keyspace>
@@ -774,10 +774,10 @@ class CQL3HelpTopics(CQLHelpTopics):
         or on one of its parent resources.
 
         See HELP PERMISSIONS for more info on the available permissions.
-        """
+        """)
 
     def help_revoke(self):
-        print """
+        print("""
         REVOKE (<permission> [PERMISSION] | ALL [PERMISSIONS])
                   ON ALL KEYSPACES
                    | KEYSPACE <keyspace>
@@ -792,10 +792,10 @@ class CQL3HelpTopics(CQLHelpTopics):
         or on one of its parent resources.
 
         See HELP PERMISSIONS for more info on the available permissions.
-        """
+        """)
 
     def help_list_permissions(self):
-        print """
+        print("""
         LIST (<permission> [PERMISSION] | ALL [PERMISSIONS])
                   [ON ALL KEYSPACES
                     | KEYSPACE <keyspace>
@@ -810,10 +810,10 @@ class CQL3HelpTopics(CQLHelpTopics):
         and all its parents (table, table's keyspace and ALL KEYSPACES).
 
         See HELP PERMISSIONS for more info on the available permissions.
-        """
+        """)
 
     def help_permissions(self):
-        print """
+        print("""
         PERMISSIONS
 
         Cassandra has 6 permissions:
@@ -823,4 +823,4 @@ class CQL3HelpTopics(CQLHelpTopics):
           DROP: required for DROP KEYSPACE, DROP TABLE
           MODIFY: required for INSERT, DELETE, UPDATE, TRUNCATE
           SELECT: required for SELECT
-        """
+        """)

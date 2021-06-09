@@ -24,7 +24,7 @@ def install_my_kernel_spec(user=True):
             json.dump(kernel_json, f, sort_keys=True)
         # TODO: Copy resources once they're specified
 
-        print('Installing IPython kernel spec to connect to cassandra host "%s"' % hostname)
+        print(('Installing IPython kernel spec to connect to cassandra host "%s"' % hostname))
         install_kernel_spec(td, 'CQL', user=user, replace=True)
 
 def _is_root():

@@ -15,7 +15,7 @@
 # limitations under the License.
 
 import codecs
-from itertools import izip
+
 from datetime import timedelta, tzinfo
 
 ZERO = timedelta(0)
@@ -66,7 +66,7 @@ def find_common_prefix(strs):
     """
 
     common = []
-    for cgroup in izip(*strs):
+    for cgroup in zip(*strs):
         if all(x == cgroup[0] for x in cgroup[1:]):
             common.append(cgroup[0])
         else:

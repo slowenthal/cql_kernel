@@ -1,15 +1,15 @@
-import StringIO
+import io
 import os
 from ipykernel.kernelbase import Kernel
 from cassandra.cluster import Cluster
 
 # from cqlsh import setup_cqlruleset
 import sys
-import cqlsh
+from . import cqlsh
 from cqlshlib_cql_kernel import cql3handling
 
 
-from cqlsh import Shell
+from .cqlsh import Shell
 import re
 
 __version__ = '0.2'
@@ -53,7 +53,7 @@ class CQLKernel(Kernel):
         c = Cluster([self.hostname])
         self.cqlshell = Shell("127.0.0.1", 9042, use_conn = c )
         self.cqlshell.use_paging = False
-        self.outStringWriter = StringIO.StringIO()
+        self.outStringWriter = io.StringIO()
         self.cqlshell.query_out = self.outStringWriter
         self.cqlshell.stdout = self.outStringWriter
 

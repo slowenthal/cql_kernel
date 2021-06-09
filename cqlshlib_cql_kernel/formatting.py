@@ -19,12 +19,12 @@ import sys
 import re
 import calendar
 import math
-import wcwidth
+from . import wcwidth
 from collections import defaultdict
-from displaying import colorme, get_str, FormattedValue, DEFAULT_VALUE_COLORS, NO_COLOR_MAP
+from .displaying import colorme, get_str, FormattedValue, DEFAULT_VALUE_COLORS, NO_COLOR_MAP
 from cassandra.cqltypes import EMPTY
 from cassandra.util import datetime_from_timestamp
-from util import UTC
+from .util import UTC
 
 unicode_controlchars_re = re.compile(r'[\x00-\x31\x7f-\xa0]')
 controlchars_re = re.compile(r'[\x00-\x31\x7f-\xff]')
@@ -162,7 +162,7 @@ def format_floating_point_type(val, colormap, float_precision, **_):
     elif math.isinf(val):
         bval = 'Infinity' if val > 0 else '-Infinity'
     else:
-        exponent = int(math.log10(abs(val))) if abs(val) > sys.float_info.epsilon else -sys.maxint - 1
+        exponent = int(math.log10(abs(val))) if abs(val) > sys.float_info.epsilon else -sys.maxsize - 1
         if -4 <= exponent < float_precision:
             # when this is true %g will not use scientific notation,
             # increasing precision should not change this decision
@@ -201,7 +201,7 @@ def strftime(time_format, seconds):
 
 @formatter_for('str')
 def format_value_text(val, encoding, colormap, quote=False, **_):
-    escapedval = val.replace(u'\\', u'\\\\')
+    escapedval = val.replace('\\', '\\\\')
     if quote:
         escapedval = escapedval.replace("'", "''")
     escapedval = unicode_controlchars_re.sub(_show_control_chars, escapedval)
@@ -290,7 +290,7 @@ def format_value_utype(val, encoding, colormap, time_format, float_precision, nu
     def format_field_name(name):
         return format_value_text(name, encoding=encoding, colormap=colormap, quote=False)
 
-    subs = [(format_field_name(k), format_field_value(v)) for (k, v) in val._asdict().items()]
+    subs = [(format_field_name(k), format_field_value(v)) for (k, v) in list(val._asdict().items())]
     bval = '{' + ', '.join(get_str(k) + ': ' + get_str(v) for (k, v) in subs) + '}'
     if colormap is NO_COLOR_MAP:
         return bval
