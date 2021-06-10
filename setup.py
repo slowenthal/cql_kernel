@@ -7,7 +7,7 @@ setup(
     url='https://github.com/bschoening/cql_jupyter',
     license='Apache',
     author='Brad Schoening, Steven Lowenthal & Apache Cassandra Developers',
-    install_requires = ['cassandra-driver>=3.25],
+    install_requires = ['cassandra-driver>=3.25'],
     tests_require = ['jupyter_kernel_test','nose>=1.3.7'],
     description='CQL Kernel for Jupyter based on cqlsh'
 )
