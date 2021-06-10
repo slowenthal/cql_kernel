@@ -2,8 +2,8 @@ A Jupyter kernel for the Apache Cassandra Database
 
 To install::
 
-    pip install cql_kernel
-    python -m cql_kernel.install  [<cassandra hostname>]
+    pip install cql_jupyter
+    python -m cql_jupyter.install  [<cassandra hostname>]
 
 You can always rerun the the above command to change the hostname.  It's best to restart Jupyter after running it.
 You can get away with closing your notebook, and then refreshing the main Jupyter page too, but that's error-prone.
