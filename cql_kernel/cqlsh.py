@@ -123,13 +123,13 @@ cqlshlibdir = os.path.join(CASSANDRA_PATH, 'pylib')
 if os.path.isdir(cqlshlibdir):
     sys.path.insert(0, cqlshlibdir)
 
-from cqlshlib_cql_kernel import cql3handling, cqlhandling, pylexotron, sslhandling, copy
-from cqlshlib_cql_kernel.displaying import (ANSI_RESET, BLUE, COLUMN_NAME_COLORS, CYAN,
+from cqlshlib_cql_jupyter import cql3handling, cqlhandling, pylexotron, sslhandling, copy
+from cqlshlib_cql_jupyter.displaying import (ANSI_RESET, BLUE, COLUMN_NAME_COLORS, CYAN,
                                  RED, FormattedValue, colorme)
-from cqlshlib_cql_kernel.formatting import (format_by_type, format_value_utype,
+from cqlshlib_cql_jupyter.formatting import (format_by_type, format_value_utype,
                                  formatter_for)
-from cqlshlib_cql_kernel.tracing import print_trace, print_trace_session
-from cqlshlib_cql_kernel.util import get_file_encoding_bomsize, trim_if_present
+from cqlshlib_cql_jupyter.tracing import print_trace, print_trace_session
+from cqlshlib_cql_jupyter.util import get_file_encoding_bomsize, trim_if_present
 
 DEFAULT_HOST = '127.0.0.1'
 DEFAULT_PORT = 9042
