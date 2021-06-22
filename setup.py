@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='cql_jupyter',
-    version='1.0.0',
+    version='0.9.0',
     packages=['cqlshlib_cql_kernel', 'cqlshlib_cql_kernel.test', 'cql_kernel'],
     url='https://github.com/bschoening/cql_jupyter',
     license='Apache',

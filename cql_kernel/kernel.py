@@ -6,7 +6,7 @@ from cassandra.cluster import Cluster
 # from cqlsh import setup_cqlruleset
 import sys
 from . import cqlsh
-from cqlshlib_cql_kernel import cql3handling
+from cqlshlib_cql_jupyter import cql3handling
 
 
 from .cqlsh import Shell
@@ -17,7 +17,7 @@ __version__ = '0.2'
 version_pat = re.compile(r'version (\d+(\.\d+)+)')
 
 class CQLKernel(Kernel):
-    implementation = 'cql_kernel'
+    implementation = 'cql_jupyter'
     implementation_version = __version__
 
 
