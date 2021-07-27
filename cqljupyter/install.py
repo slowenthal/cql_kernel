@@ -10,7 +10,7 @@ if len(sys.argv) > 1:
 else:
     hostname = 'localhost'
 
-kernel_json = {"argv":[sys.executable,"-m","cql_jupyter", "-f", "{connection_file}"],
+kernel_json = {"argv":[sys.executable,"-m","cqljupyter", "-f", "{connection_file}"],
  "display_name":"CQL",
  "language":"CQL",
  "codemirror_mode":"sql",
