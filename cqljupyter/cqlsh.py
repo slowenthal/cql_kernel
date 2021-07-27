@@ -111,7 +111,7 @@ except ImportError as e:
              'Error: %s\n' % (sys.executable, sys.path, e))
 
 from cassandra.auth import PlainTextAuthProvider
-from cassandra.cluster import Cluster, PagedResult
+from cassandra.cluster import Cluster,ResultSet
 from cassandra.metadata import protect_name, protect_names, protect_value
 from cassandra.policies import WhiteListRoundRobinPolicy
 from cassandra.protocol import QueryMessage, ResultMessage
@@ -1135,7 +1135,7 @@ class Shell(cmd.Cmd):
         self.decoding_errors = []
 
         self.writeresult("")
-        if isinstance(rows, PagedResult) and self.tty:
+        if isinstance(rows, ResultSet) and self.tty:
             num_rows = 0
             while True:
                 page = list(rows.current_response)
