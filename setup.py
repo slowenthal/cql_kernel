@@ -1,10 +1,10 @@
 from setuptools import setup
 
 setup(
-    name='cql_jupyter',
+    name='cqljupyter',
     version='0.9.0',
     packages=['cqlshlib_cql_kernel', 'cqlshlib_cql_kernel.test', 'cql_kernel'],
-    url='https://github.com/bschoening/cql_jupyter',
+    url='https://github.com/bschoening/cqljupyter',
     license='Apache',
     author='Brad Schoening, Steven Lowenthal & Apache Cassandra Developers',
     install_requires = ['cassandra-driver>=3.25'],
