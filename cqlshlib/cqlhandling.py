@@ -18,10 +18,24 @@
 # i.e., stuff that's not necessarily cqlsh-specific
 
 import traceback
-from cassandra.metadata import cql_keywords_reserved
-from . import pylexotron, util
+
+import cassandra
+from cqlshlib import pylexotron, util
 
 Hint = pylexotron.Hint
+
+cql_keywords_reserved = set((
+    'add', 'allow', 'alter', 'and', 'apply', 'asc', 'authorize', 'batch', 'begin', 'by', 'columnfamily', 'create',
+    'delete', 'desc', 'describe', 'drop', 'entries', 'execute', 'from', 'full', 'grant', 'if', 'in', 'index',
+    'infinity', 'insert', 'into', 'is', 'keyspace', 'limit', 'materialized', 'modify', 'nan', 'norecursive', 'not',
+    'null', 'of', 'on', 'or', 'order', 'primary', 'rename', 'revoke', 'schema', 'select', 'set', 'table', 'to', 'token',
+    'truncate', 'unlogged', 'update', 'use', 'using', 'view', 'where', 'with'
+))
+"""
+Set of reserved keywords in CQL.
+
+Derived from .../cassandra/src/java/org/apache/cassandra/cql3/ReservedKeywords.java
+"""
 
 
 class CqlParsingRuleSet(pylexotron.ParsingRuleSet):
@@ -30,25 +44,19 @@ class CqlParsingRuleSet(pylexotron.ParsingRuleSet):
         'DeflateCompressor',
         'SnappyCompressor',
         'LZ4Compressor',
+        'ZstdCompressor',
     )
 
     available_compaction_classes = (
         'LeveledCompactionStrategy',
         'SizeTieredCompactionStrategy',
-        'DateTieredCompactionStrategy'
+        'DateTieredCompactionStrategy',
+        'TimeWindowCompactionStrategy'
     )
 
     replication_strategies = (
         'SimpleStrategy',
-        'OldNetworkTopologyStrategy',
         'NetworkTopologyStrategy'
-    )
-
-    replication_factor_strategies = (
-        'SimpleStrategy',
-        'org.apache.cassandra.locator.SimpleStrategy',
-        'OldNetworkTopologyStrategy',
-        'org.apache.cassandra.locator.OldNetworkTopologyStrategy'
     )
 
     def __init__(self, *args, **kwargs):
@@ -56,14 +64,15 @@ class CqlParsingRuleSet(pylexotron.ParsingRuleSet):
 
         # note: commands_end_with_newline may be extended by callers.
         self.commands_end_with_newline = set()
-        self.set_reserved_keywords(cql_keywords_reserved)
+        self.set_reserved_keywords()
 
-    def set_reserved_keywords(self, keywords):
+    def set_reserved_keywords(self):
         """
-        We cannot let resreved cql keywords be simple 'identifier' since this caused
+        We cannot let reserved cql keywords be simple 'identifier' since this caused
         problems with completion, see CASSANDRA-10415
         """
-        syntax = '<reserved_identifier> ::= /(' + '|'.join(r'\b%s\b' % (k,) for k in keywords) + ')/ ;'
+        cassandra.metadata.cql_keywords_reserved = cql_keywords_reserved
+        syntax = '<reserved_identifier> ::= /(' + '|'.join(r'\b{}\b'.format(k) for k in cql_keywords_reserved) + ')/ ;'
         self.append_rules(syntax)
 
     def completer_for(self, rulename, symname):
@@ -107,12 +116,6 @@ class CqlParsingRuleSet(pylexotron.ParsingRuleSet):
             # operations on tokens (like .lower()).  See CASSANDRA-9083
             # for one example of this.
             str_token = t[1]
-            if isinstance(str_token, str):
-                try:
-                    str_token = str_token.encode('ascii')
-                    t = (t[0], str_token) + t[2:]
-                except UnicodeEncodeError:
-                    pass
 
             curstmt.append(t)
             if t[0] == 'endtoken':
@@ -142,6 +145,7 @@ class CqlParsingRuleSet(pylexotron.ParsingRuleSet):
         stmts = util.split_list(tokens, lambda t: t[0] == 'endtoken')
         output = []
         in_batch = False
+        in_pg_string = len([st for st in tokens if len(st) > 0 and st[0] == 'unclosedPgString']) == 1
         for stmt in stmts:
             if in_batch:
                 output[-1].extend(stmt)
@@ -152,7 +156,7 @@ class CqlParsingRuleSet(pylexotron.ParsingRuleSet):
                     in_batch = False
                 elif stmt[0][1].upper() == 'BEGIN':
                     in_batch = True
-        return output, in_batch
+        return output, in_batch or in_pg_string
 
     def cql_complete_single(self, text, partial, init_bindings={}, ignore_case=True,
                             startsymbol='Start'):
@@ -306,7 +310,7 @@ class CqlParsingRuleSet(pylexotron.ParsingRuleSet):
                 first = first[:-1]
             if debug:
                 print("** Got a partial completion: %r." % (common_prefix,))
-            first += common_prefix
+            return first + common_prefix
         if debug:
             print("** New total completion: %r. Checking for further matches...\n" % (first,))
         return self.cql_complete_multiple(text, first, init_bindings, startsymbol=startsymbol)
@@ -321,7 +325,7 @@ class CqlParsingRuleSet(pylexotron.ParsingRuleSet):
         if tok[0] == 'unclosedName':
             # strip one quote
             return tok[1][1:].replace('""', '"')
-        if tok[0] == 'stringLiteral':
+        if tok[0] == 'quotedStringLiteral':
             # strip quotes
             return tok[1][1:-1].replace("''", "'")
         if tok[0] == 'unclosedString':

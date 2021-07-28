@@ -14,16 +14,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from __future__ import unicode_literals
+
 import re
+import six
 
 LIGHT = 0o10
 
-ansi_CSI = '\033['
+
+ansi_CSI = '\x1b['
 ansi_seq = re.compile(re.escape(ansi_CSI) + r'(?P<params>[\x20-\x3f]*)(?P<final>[\x40-\x7e])')
 ansi_cmd_SGR = 'm'  # set graphics rendition
 
 color_defs = (
-    (0o00, 'k', 'black'),
+    (000, 'k', 'black'),
     (0o01, 'r', 'dark red'),
     (0o02, 'g', 'dark green'),
     (0o03, 'w', 'brown', 'dark yellow'),
@@ -61,7 +65,7 @@ for colordef in color_defs:
     for c in nameset:
         colors_by_name[c] = colorcode
 
-class ColoredChar:
+class ColoredChar(object):
     def __init__(self, c, colorcode):
         self.c = c
         self._colorcode = colorcode
@@ -100,11 +104,11 @@ class ColoredChar:
     def colortag(self):
         return lookup_letter_from_code(self._colorcode)
 
-class ColoredText:
+class ColoredText(object):
     def __init__(self, source=''):
-        if isinstance(source, basestring):
+        if isinstance(source, six.text_type):
             plain, colors = self.parse_ansi_colors(source)
-            self.chars = map(ColoredChar, plain, colors)
+            self.chars = list(map(ColoredChar, plain, colors))
         else:
             # expected that source is an iterable of ColoredChars (or duck-typed as such)
             self.chars = tuple(source)
@@ -149,7 +153,7 @@ class ColoredText:
     @staticmethod
     def parse_sgr_param(curclr, paramstr):
         oldclr = curclr
-        args = map(int, paramstr.split(';'))
+        args = list(map(int, paramstr.split(';')))
         for a in args:
             if a == 0:
                 curclr = lookup_colorcode('neutral')
