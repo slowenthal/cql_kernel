@@ -15,17 +15,6 @@ To use it, run one of::
     jupyter qtconsole --kernel cql
     jupyter console --kernel cql
 
-Source
-======
-
-1. The subdirectory cqlshlib has been copied directly from
-
-https://github.com/apache/cassandra/tree/cassandra-3.11/pylib/cqlshlib
-
-2. cqlsh.py is copied from
-
-https://github.com/apache/cassandra/blob/cassandra-3.11/bin/cqlsh.py
-
 Syntax
 ======
 
@@ -51,3 +40,25 @@ How to Build::
     python setup.py sdist upload
     python setup.py bdist upload
 
+
+Implementation Notes
+====================
+
+1. The subdirectory cqlshlib has been copied directly from
+`cassandra-3.11/pylib/cqlshlib
+<https://github.com/apache/cassandra/tree/cassandra-3.11/pylib/cqlshlib>`_
+
+2. cqlsh.py is copied from
+
+https://github.com/apache/cassandra/blob/cassandra-3.x/bin/cqlsh.py
+
+
+Author
+======
+This package was written by Brad Schoening for Python 3. It is based upon earlier work
+by Steve Lowenthal and uses the open source CQLSH library.
+
+License
+=======
+This project is licensed under the terms of the
+`Apache 2.0 license <https://www.apache.org/licenses/LICENSE-2.0>`_.
