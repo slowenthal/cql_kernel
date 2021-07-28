@@ -10,20 +10,34 @@ You can get away with closing your notebook, and then refreshing the main Jupyte
 
 To use it, run one of::
 
-    ipython notebook
+    jupyter notebook
     # In the notebook interface, select CQL from the 'New' menu
-    ipython qtconsole --kernel cql
-    ipython console --kernel cql
+    jupyter qtconsole --kernel cql
+    jupyter console --kernel cql
 
-Syntax::
+Source
+======
+
+1. The subdirectory cqlshlib has been copied directly from
+
+https://github.com/apache/cassandra/tree/cassandra-3.11/pylib/cqlshlib
+
+2. cqlsh.py is copied from
+
+https://github.com/apache/cassandra/blob/cassandra-3.11/bin/cqlsh.py
+
+Syntax
+======
 
 All regular cqlsh syntax is supported.
 
-Auto-complete::
+Auto-complete
+-------------
 
 Use the <TAB> key to invoke auto-complete
 
-    %%html magic::
+%%html magic
+------------
 
 If you start a cell with %%html, the html will be returned and rendered
 
@@ -32,7 +46,9 @@ For details of how this works, see the Jupyter docs on `wrapper kernels
 Pexpect's docs on the `replwrap module
 <http://pexpect.readthedocs.org/en/latest/api/replwrap.html>`_
 
-To build::
+To build
+========
 
     python setup.py sdist upload
     python setup.py bdist upload
+
