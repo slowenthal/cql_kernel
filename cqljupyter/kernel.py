@@ -6,7 +6,7 @@ from cassandra.cluster import Cluster
 # from cqlsh import setup_cqlruleset
 import sys
 from . import cqlsh
-from cqlshlib_cqljupyter import cql3handling
+from cqlshlib import cql3handling
 
 
 from .cqlsh import Shell

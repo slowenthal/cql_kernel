@@ -33,7 +33,7 @@ exit 1
 
 import cmd
 import codecs
-import configparser
+#import configparser
 import csv
 import getpass
 import locale
@@ -100,6 +100,13 @@ for lib in third_parties:
     if lib_zip:
         sys.path.insert(0, lib_zip)
 
+# We cannot import six until we add its location to sys.path so the Python
+# interpreter can find it. Do not move this to the top.
+import six
+
+from six.moves import configparser, input
+from six import StringIO, ensure_text, ensure_str
+
 warnings.filterwarnings("ignore", r".*blist.*")
 try:
     import cassandra
@@ -123,13 +130,14 @@ cqlshlibdir = os.path.join(CASSANDRA_PATH, 'pylib')
 if os.path.isdir(cqlshlibdir):
     sys.path.insert(0, cqlshlibdir)
 
-from cqlshlib_cqljupyter import cql3handling, cqlhandling, pylexotron, sslhandling, copy
-from cqlshlib_cqljupyter.displaying import (ANSI_RESET, BLUE, COLUMN_NAME_COLORS, CYAN,
+from cqlshlib import cql3handling, cqlhandling, pylexotron, sslhandling
+from cqlshlib.copyutil import ExportTask, ImportTask
+from cqlshlib.displaying import (ANSI_RESET, BLUE, COLUMN_NAME_COLORS, CYAN,
                                  RED, FormattedValue, colorme)
-from cqlshlib_cqljupyter.formatting import (format_by_type, format_value_utype,
+from cqlshlib.formatting import (format_by_type, format_value_utype,
                                  formatter_for)
-from cqlshlib_cqljupyter.tracing import print_trace, print_trace_session
-from cqlshlib_cqljupyter.util import get_file_encoding_bomsize, trim_if_present
+from cqlshlib.tracing import print_trace, print_trace_session
+from cqlshlib.util import get_file_encoding_bomsize, trim_if_present
 
 DEFAULT_HOST = '127.0.0.1'
 DEFAULT_PORT = 9042
@@ -1539,13 +1547,14 @@ class Shell(cmd.Cmd):
             ks = self.current_keyspace
             if ks is None:
                 raise NoKeyspaceError("Not in any keyspace.")
-        cf = self.cql_unprotect_name(parsed.get_binding('cfname'))
+
+        table = self.cql_unprotect_name(parsed.get_binding('cfname'))
         columns = parsed.get_binding('colnames', None)
         if columns is not None:
             columns = list(map(self.cql_unprotect_name, columns))
         else:
             # default to all known columns
-            columns = self.get_column_names(ks, cf)
+            columns = self.get_column_names(ks, table)
         fname = parsed.get_binding('fname', None)
         if fname is not None:
             fname = os.path.expanduser(self.cql_unprotect_value(fname))
@@ -1554,111 +1563,17 @@ class Shell(cmd.Cmd):
         cleancopyoptvals = [optval.decode('string-escape') for optval in copyoptvals]
         opts = dict(list(zip(copyoptnames, cleancopyoptvals)))
 
-        print("\nStarting copy of %s.%s with columns %s." % (ks, cf, columns))
-
-        timestart = time.time()
-
         direction = parsed.get_binding('dir').upper()
         if direction == 'FROM':
-            rows = self.perform_csv_import(ks, cf, columns, fname, opts)
+            task = ImportTask(self, ks, table, columns, fname, opts, self.conn.protocol_version, CONFIG_FILE)
             verb = 'imported'
         elif direction == 'TO':
-            rows = self.perform_csv_export(ks, cf, columns, fname, opts)
+            task = ExportTask(self, ks, table, columns, fname, opts, self.conn.protocol_version, CONFIG_FILE)
             verb = 'exported'
         else:
             raise SyntaxError("Unknown direction %s" % direction)
 
-        timeend = time.time()
-        print("\n%d rows %s in %s." % (rows, verb, describe_interval(timeend - timestart)))
-
-    def perform_csv_import(self, ks, cf, columns, fname, opts):
-        csv_options, dialect_options, unrecognized_options = copy.parse_options(self, opts)
-        if unrecognized_options:
-            self.printerr('Unrecognized COPY FROM options: %s'
-                          % ', '.join(list(unrecognized_options.keys())))
-            return 0
-        nullval, header = csv_options['nullval'], csv_options['header']
-
-        if fname is None:
-            do_close = False
-            print("[Use \. on a line by itself to end input]")
-            linesource = self.use_stdin_reader(prompt='[copy] ', until=r'\.')
-        else:
-            do_close = True
-            try:
-                linesource = open(fname, 'rb')
-            except IOError as e:
-                self.printerr("Can't open %r for reading: %s" % (fname, e))
-                return 0
-
-        current_record = None
-        processes, pipes = [], [],
-        try:
-            if header:
-                next(linesource)
-            reader = csv.reader(linesource, **dialect_options)
-
-            num_processes = copy.get_num_processes(cap=4)
-
-            for i in range(num_processes):
-                parent_conn, child_conn = mp.Pipe()
-                pipes.append(parent_conn)
-                proc_args = (child_conn, ks, cf, columns, nullval)
-                processes.append(mp.Process(target=self.multiproc_import, args=proc_args))
-
-            for process in processes:
-                process.start()
-
-            meter = copy.RateMeter(10000)
-            for current_record, row in enumerate(reader, start=1):
-                # write to the child process
-                pipes[current_record % num_processes].send((current_record, row))
-
-                # update the progress and current rate periodically
-                meter.increment()
-
-                # check for any errors reported by the children
-                if (current_record % 100) == 0:
-                    if self._check_import_processes(current_record, pipes):
-                        # no errors seen, continue with outer loop
-                        continue
-                    else:
-                        # errors seen, break out of outer loop
-                        break
-        except Exception as exc:
-            if current_record is None:
-                # we failed before we started
-                self.printerr("\nError starting import process:\n")
-                self.printerr(str(exc))
-                if self.debug:
-                    traceback.print_exc()
-            else:
-                self.printerr("\n" + str(exc))
-                self.printerr("\nAborting import at record #%d. "
-                              "Previously inserted records and some records after "
-                              "this number may be present."
-                              % (current_record,))
-                if self.debug:
-                    traceback.print_exc()
-        finally:
-            # send a message that indicates we're done
-            for pipe in pipes:
-                pipe.send((None, None))
-
-            for process in processes:
-                process.join()
-
-            self._check_import_processes(current_record, pipes)
-
-            for pipe in pipes:
-                pipe.close()
-
-            if do_close:
-                linesource.close()
-            elif self.tty:
-                print()
-
-        return current_record
+        task.run()
 
     def _check_import_processes(self, current_record, pipes):
         for pipe in pipes:
@@ -1821,15 +1736,6 @@ class Shell(cmd.Cmd):
                 time.sleep(0.01)
 
             new_cluster.shutdown()
-
-    def perform_csv_export(self, ks, cf, columns, fname, opts):
-        csv_options, dialect_options, unrecognized_options = copy.parse_options(self, opts)
-        if unrecognized_options:
-            self.printerr('Unrecognized COPY TO options: %s' % ', '.join(list(unrecognized_options.keys())))
-            return 0
-
-        return copy.ExportTask(self, ks, cf, columns, fname, csv_options, dialect_options,
-                               DEFAULT_PROTOCOL_VERSION, CONFIG_FILE).run()
 
     def do_show(self, parsed):
         """

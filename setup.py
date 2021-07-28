@@ -2,8 +2,8 @@ from setuptools import setup
 
 setup(
     name='cqljupyter',
-    version='0.9.6',
-    packages=['cqlshlib_cqljupyter', 'cqlshlib_cqljupyter.test', 'cqljupyter'],
+    version='0.9.61',
+    packages=['cqlshlib', 'cqlshlib.test', 'cqljupyter'],
     url='https://github.com/bschoening/cqljupyter',
     license='Apache',
     author='Brad Schoening, Steven Lowenthal & Apache Cassandra Developers',
