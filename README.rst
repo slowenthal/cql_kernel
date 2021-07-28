@@ -46,8 +46,7 @@ For details of how this works, see the Jupyter docs on `wrapper kernels
 Pexpect's docs on the `replwrap module
 <http://pexpect.readthedocs.org/en/latest/api/replwrap.html>`_
 
-To build
-========
+How to Build::
 
     python setup.py sdist upload
     python setup.py bdist upload
