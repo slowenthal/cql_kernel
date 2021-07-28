@@ -47,7 +47,7 @@ Implementation Notes
 `cassandra-3.11/pylib/cqlshlib
 <https://github.com/apache/cassandra/tree/cassandra-3.11/pylib/cqlshlib>`_
 
-2. cqlsh.py is copied from
+2. cqlsh.py was copied from 3.x and converted using 2to3 to python3 syntax
 
 https://github.com/apache/cassandra/blob/cassandra-3.x/bin/cqlsh.py
 
