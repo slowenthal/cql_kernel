@@ -6,10 +6,13 @@ A Jupyter kernel for the Apache Cassandra Database
 To install:
 
     pip install cqljupyter
+
+To configure the Cassandra host or IP address:
+
     python -m cqljupyter.install  [<cassandra hostname>]
 
 You can always rerun the the above command to change the hostname. It's
-best to restart Jupyter after running it. You can get away with closing
+best to restart Jupyter after running it. You can often get away with closing
 your notebook, and then refreshing the main Jupyter page too, but that's
 error-prone.
 
@@ -17,7 +20,7 @@ To use it:
 
     jupyter notebook
 
-In the notebook interface, select CQL from the 'New' menu
+In the notebook interface, select **CQL** from the **New** menu
 
 Syntax
 ======
@@ -27,12 +30,12 @@ All regular CQL syntax is supported.
 Auto-complete
 -------------
 
-Use the \<TAB\> key to invoke auto-complete
+Use the **TAB** key to invoke auto-complete
 
 HTML
 ----
 
-If you start a cell with %%html, the html will be returned and rendered
+If you start a cell with **%%html**, the html will be returned and rendered
 
 Build
 =====
