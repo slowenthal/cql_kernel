@@ -13,47 +13,49 @@ best to restart Jupyter after running it. You can get away with closing
 your notebook, and then refreshing the main Jupyter page too, but that's
 error-prone.
 
-To use it, run one of:
+To use it:
 
     jupyter notebook
-    # In the notebook interface, select CQL from the 'New' menu
-    jupyter qtconsole --kernel cql
-    jupyter console --kernel cql
+
+In the notebook interface, select CQL from the 'New' menu
 
 Syntax
 ======
 
-All regular cqlsh syntax is supported.
+All regular CQL syntax is supported.
 
 Auto-complete
 -------------
 
 Use the \<TAB\> key to invoke auto-complete
 
-%%html magic
-------------
+HTML
+----
 
 If you start a cell with %%html, the html will be returned and rendered
 
-For details of how this works, see the Jupyter docs on [wrapper
-kernels](http://jupyter-client.readthedocs.org/en/latest/wrapperkernels.html),
-and Pexpect's docs on the [replwrap
-module](http://pexpect.readthedocs.org/en/latest/api/replwrap.html)
-
-How to Build:
+Build
+=====
+Build using:
 
     python setup.py sdist
 
 Implementation Notes
 ====================
 
-​1. The subdirectory cqlshlib has been copied directly from
+1. The subdirectory cqlshlib has been copied directly from
 [cassandra-3.11/pylib/cqlshlib](https://github.com/apache/cassandra/tree/cassandra-3.11/pylib/cqlshlib)
 
-2.  cqlsh.py was copied from 3.x and converted using 2to3 to python3
+
+2.  The file cqlsh.py was copied from 3.x and converted using 2to3 to python3
     syntax
 
-<https://github.com/apache/cassandra/blob/cassandra-3.x/bin/cqlsh.py>
+    <https://github.com/apache/cassandra/blob/cassandra-3.x/bin/cqlsh.py>
+
+For details of how this works, see the Jupyter docs on [wrapper
+kernels](http://jupyter-client.readthedocs.org/en/latest/wrapperkernels.html),
+and Pexpect's docs on the [replwrap
+module](http://pexpect.readthedocs.org/en/latest/api/replwrap.html)
 
 Author
 ======
