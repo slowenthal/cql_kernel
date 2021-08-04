@@ -22,6 +22,10 @@ To use it:
 
 In the notebook interface, select **CQL** from the **New** menu
 
+To run the sample CQL:
+
+    jupyter notebook Sample.ipydb
+
 Syntax
 ======
 
