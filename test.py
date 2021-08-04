@@ -1,5 +1,5 @@
-from cql_kernel.kernel import CQLKernel
-from cqlshlib_cql_kernel.cql3handling import CqlRuleSet
+from cqljupyter.kernel import CQLKernel
+from cqlshlib.cql3handling import CqlRuleSet
 
 cqlkernel = CQLKernel.instance()
 
