@@ -11,7 +11,7 @@ To configure the Cassandra host or IP address:
 
     python -m cqljupyter.install  [<cassandra hostname>]
 
-You can always rerun the the above command to change the hostname. It's
+You can always rerun the above command to change the hostname. It's
 best to restart Jupyter after running it. You can often get away with closing
 your notebook, and then refreshing the main Jupyter page too, but that's
 error-prone.
