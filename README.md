@@ -50,10 +50,10 @@ Implementation Notes
 [cassandra-3.11/pylib/cqlshlib](https://github.com/apache/cassandra/tree/cassandra-3.11/pylib/cqlshlib)
 
 
-2.  The file cqlsh.py was copied from 3.x and converted using 2to3 to python3
+2.  The file cqlsh.py was ported from 3.11 and converted using 2to3 to python3
     syntax
 
-    <https://github.com/apache/cassandra/blob/cassandra-3.x/bin/cqlsh.py>
+    <https://github.com/apache/cassandra/blob/cassandra-3.11.10/bin/cqlsh.py>
 
 For details of how this works, see the Jupyter docs on [wrapper
 kernels](http://jupyter-client.readthedocs.org/en/latest/wrapperkernels.html),
@@ -64,8 +64,8 @@ Author
 ======
 
 This package was developed by Brad Schoening for Python 3. It is based
-upon earlier work by Steve Lowenthal and uses the open source CQLSH
-library.
+upon earlier work by Steve Lowenthal and uses the open source Apache 
+Cassandra CQLSH library.
 
 License
 =======

@@ -1185,7 +1185,10 @@ class Shell(cmd.Cmd):
         try:
             result = future.result()
         except CQL_ERRORS as err:
-            self.printerr(str(err.__class__.__name__) + ": " + err.message.decode(encoding='utf-8'))
+            # self.printerr(str(err.__class__.__name__) + ": " + err.message.decode(encoding='utf-8'))
+            self.printerr(str(err.__class__.__name__))
+            self.printerr("--------")
+            self.printerr(str(err))
         except Exception:
             import traceback
             self.printerr(traceback.format_exc())
@@ -1247,7 +1250,7 @@ class Shell(cmd.Cmd):
 
         if self.decoding_errors:
             for err in self.decoding_errors[:2]:
-                self.writeresult(err.message(), color=RED)
+                self.writeresult(err, color=RED)
             if len(self.decoding_errors) > 2:
                 self.writeresult('%d more decoding errors suppressed.'
                                  % (len(self.decoding_errors) - 2), color=RED)
@@ -1761,11 +1764,18 @@ class Shell(cmd.Cmd):
         password = self.auth_provider.password if self.auth_provider else None
         subshell = Shell(self.hostname, self.port, color=self.color,
                          username=username, password=password,
-                         encoding=self.encoding, stdin=f,
-                         tty=False, use_conn=self.conn, cqlver=self.cql_version,
-                         display_time_format=self.display_time_format,
+                         encoding=self.encoding, stdin=f, tty=False, use_conn=self.conn,
+                         cqlver=self.cql_version, keyspace=self.current_keyspace,
+                         tracing_enabled=self.tracing_enabled,
+                         display_nanotime_format=self.display_nanotime_format,
+                         display_timestamp_format=self.display_timestamp_format,
+                         display_date_format=self.display_date_format,
                          display_float_precision=self.display_float_precision,
-                         max_trace_wait=self.max_trace_wait)
+                         display_double_precision=self.display_double_precision,
+                         display_timezone=self.display_timezone,
+                         max_trace_wait=self.max_trace_wait, ssl=self.ssl,
+                         request_timeout=self.session.default_timeout,
+                         connect_timeout=self.conn.connect_timeout)
         subshell.cmdloop()
         f.close()
 
@@ -2037,10 +2047,6 @@ class Shell(cmd.Cmd):
             return text
         return color + text + ANSI_RESET
 
-    # def writeresult(self, text, color=None, newline=True, out=None):
-    #     if out is None:
-    #         out = self.query_out
-    #     out.write(self.applycolor(str(text), color) + ('\n' if newline else ''))
     def writeresult(self, text, color=None, newline=True, out=None):
         if out is None:
             out = self.query_out
@@ -2055,7 +2061,8 @@ class Shell(cmd.Cmd):
             shownum = self.show_line_nums
         if shownum:
             text = '%s:%d:%s' % (self.stdin.name, self.lineno, text)
-        self.writeresult('<span style="color:DarkRed">%s</span>' % text, color, newline=newline, out=sys.stderr)
+
+        self.writeresult(text, color, newline=newline, out=sys.stderr)
 
 
 class SwitchCommand(object):
@@ -2203,11 +2210,11 @@ def read_options(cmdlineargs, environment):
         else:
             options.color = should_use_color()
 
-    options.cqlversion, cqlvertup = full_cql_version(options.cqlversion)
-    if cqlvertup[0] < 3:
-        parser.error('%r is not a supported CQL version.' % options.cqlversion)
-    else:
-        options.cqlmodule = cql3handling
+    if options.cqlversion is not None:
+        options.cqlversion, cqlvertup = full_cql_version(options.cqlversion)
+        if cqlvertup[0] < 3:
+            parser.error('%r is not a supported CQL version.' % options.cqlversion)
+    options.cqlmodule = cql3handling
 
     try:
         port = int(port)
@@ -2280,13 +2287,12 @@ def main(options, hostname, port):
                       stdin=stdin,
                       tty=options.tty,
                       completekey=options.completekey,
-                      browser=options.browser,
+#                      browser=options.browser,
                       protocol_version=options.protocol_version,
 
                       cqlver=options.cqlversion,
                       keyspace=options.keyspace,
-                      no_compact=options.no_compact,
-                      display_time_format=options.time_format,
+                      display_timestamp_format=options.time_format,
                       display_float_precision=options.float_precision,
                       max_trace_wait=options.max_trace_wait,
                       ssl=options.ssl,

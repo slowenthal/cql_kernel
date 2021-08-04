@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='cqljupyter',
-    version='0.9.7',
+    version='0.9.8',
     packages=['cqlshlib', 'cqlshlib.test', 'cqljupyter'],
     url='https://github.com/bschoening/cqljupyter',
     license='Apache',
