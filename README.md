@@ -9,7 +9,7 @@ To install:
 
 To configure the Cassandra host or IP address:
 
-    python -m cqljupyter.install  [<cassandra hostname>]
+    python -m cqljupyter.install  [<cassandra hostname>] [--ssl]
 
 You can always rerun the above command to change the hostname. It's
 best to restart Jupyter after running it. You can often get away with closing
@@ -59,10 +59,10 @@ Implementation Notes
 
     <https://github.com/apache/cassandra/blob/cassandra-3.11.10/bin/cqlsh.py>
 
-For details of how this works, see the Jupyter docs on [wrapper
-kernels](http://jupyter-client.readthedocs.org/en/latest/wrapperkernels.html),
-and Pexpect's docs on the [replwrap
-module](http://pexpect.readthedocs.org/en/latest/api/replwrap.html)
+For details of how this works, see the Jupyter docs on
+* [wrapper kernels](http://jupyter-client.readthedocs.org/en/latest/wrapperkernels.html),
+* [Making kernels for Jupyter](https://jupyter-client.readthedocs.io/en/stable/kernels.html)
+* Pexpect's docs on the [replwrap module](http://pexpect.readthedocs.org/en/latest/api/replwrap.html)
 
 Author
 ======
