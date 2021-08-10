@@ -2,7 +2,7 @@ import base64
 import imghdr
 import os
 
-#from IPython.
+# from IPython.
 
 _TEXT_SAVED_IMAGE = "cqljupyter: saved image data to:"
 
@@ -13,6 +13,7 @@ display () {
     echo "%s $TMPFILE" >&2
 }
 """ % _TEXT_SAVED_IMAGE
+
 
 def display_data_for_image(filename):
     with open(filename, 'rb') as f:
