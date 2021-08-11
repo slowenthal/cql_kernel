@@ -1,5 +1,5 @@
-from cql_kernel.kernel import CQLKernel
-from cqlshlib_cql_kernel.cql3handling import CqlRuleSet
+from cqljupyter.kernel import CQLKernel
+from cqlshlib.cql3handling import CqlRuleSet
 
 cqlkernel = CQLKernel.instance()
 
@@ -8,12 +8,12 @@ def cutcode(code):
     completed = code[:index+1]
     partial = code[index+1:]
 
-    print 'completed: "%s"' % completed
-    print 'partial:   "%s"' % partial
+    print('completed: "%s"' % completed)
+    print('partial:   "%s"' % partial)
 
     completions = CqlRuleSet.cql_complete(completed, partial, cassandra_conn=cqlkernel,
                                   startsymbol='cqlshCommand')
-    print completions
+    print(completions)
 
 
 
@@ -25,31 +25,31 @@ cutcode("create t")
 foo = CqlRuleSet.cql_complete("CREATE", "", cassandra_conn=cqlkernel,
                                            startsymbol='cqlshCommand')
 
-print foo
+print(foo)
 foo = CqlRuleSet.cql_complete("CREATE ", "T", cassandra_conn=cqlkernel,
                                            startsymbol='cqlshCommand')
 
-print foo
+print(foo)
 foo = CqlRuleSet.cql_complete( "USE", "", cassandra_conn=cqlkernel,
                               startsymbol='cqlshCommand')
 
 
-print foo
+print(foo)
 
 foo = CqlRuleSet.cql_complete( "", "CREATE", cassandra_conn=cqlkernel,
                               startsymbol='cqlshCommand')
 
-print foo
+print(foo)
 foo = CqlRuleSet.cql_complete( "CREATE ", "", cassandra_conn=cqlkernel,
                               startsymbol='cqlshCommand')
 
 
-print foo
+print(foo)
 
 foo = cqlkernel.cqlshell.onecmd("consistency quorum;")
 foo = cqlkernel.cqlshell.onecmd("help;")
-foo = cqlkernel.cqlshell.onecmd("select * from system.localsdf;")
-foo = cqlkernel.cqlshell.onecmd("describe keyspace retail;")
+foo = cqlkernel.cqlshell.onecmd("select * from system.local;")
+foo = cqlkernel.cqlshell.onecmd("describe keyspace system;")
 
 x = 10
 
