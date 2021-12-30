@@ -2,7 +2,7 @@ import io
 import os
 from ipykernel.kernelbase import Kernel
 from cassandra.cluster import Cluster
-from ssl import SSLContext, PROTOCOL_TLSv1
+from ssl import SSLContext, PROTOCOL_TLSv1_2
 
 # from cqlsh import setup_cqlruleset
 import sys
@@ -12,7 +12,7 @@ from cqlshlib import cql3handling
 from .cqlsh import Shell
 import re
 
-__version__ = '0.2'
+__version__ = '0.9'
 
 version_pat = re.compile(r'version (\d+(\.\d+)+)')
 
@@ -21,32 +21,32 @@ class CQLKernel(Kernel):
     implementation = 'cqljupyter'
     implementation_version = __version__
     banner = "CQL kernel"
-
+    language = "CQL"
+    language_info = {'name': 'CQL',
+                     'codemirror_mode': 'sql',
+                     'mimetype': 'text/x-cassandra',
+                     'file_extension': '.cql'}
     @property
     def language_version(self):
         m = version_pat.search(self.banner)
         return m.group(1)
 
-    language_info = {'name': 'CQL',
-                     'codemirror_mode': 'sql',
-                     'mimetype': 'text/x-cassandra',
-                     'file_extension': '.cql'}
-
     def __init__(self, **kwargs):
         Kernel.__init__(self, **kwargs)
         self.hostname = os.environ.get('CASSANDRA_HOSTNAME', 'localhost')
+        self.port = int(os.environ.get('CASSANDRA_PORT', "9042"))
         self.ssl = os.environ.get('SSL') == "True"
         self._start_cql()
 
     def _start_cql(self):
         print(f"INFO ssl {self.ssl}")
         if self.ssl:
-            c = Cluster([self.hostname], ssl_context=SSLContext(PROTOCOL_TLSv1))
+            c = Cluster([self.hostname], port=self.port, ssl_context=SSLContext(PROTOCOL_TLSv1_2))
         else:
             c = Cluster([self.hostname])
         # ssl_options=sslhandling.ssl_settings(hostname, CONFIG_FILE) if ssl else None
 
-        self.cqlshell = Shell("127.0.0.1", 9042, use_conn=c)
+        self.cqlshell = Shell(self.hostname, self.port, use_conn=c)
         self.cqlshell.use_paging = False
         self.outStringWriter = io.StringIO()
         self.cqlshell.query_out = self.outStringWriter
