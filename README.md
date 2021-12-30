@@ -50,11 +50,7 @@ Build using:
 Implementation Notes
 ====================
 
-1. The subdirectory cqlshlib has been copied directly from
-[cassandra-3.11/pylib/cqlshlib](https://github.com/apache/cassandra/tree/cassandra-3.11/pylib/cqlshlib)
-
-
-2.  The file cqlsh.py was ported from 3.11 and converted using 2to3 to python3
+1.  The file cqlsh.py was ported from 3.11 and converted using 2to3 to python3
     syntax
 
     <https://github.com/apache/cassandra/blob/cassandra-3.11.10/bin/cqlsh.py>
@@ -67,9 +63,8 @@ For details of how this works, see the Jupyter docs on
 Author
 ======
 
-This package was developed by Brad Schoening for Python 3. It is based
-upon earlier work by Steve Lowenthal and uses the open source Apache 
-Cassandra CQLSH library.
+This package was developed by Brad Schoening for Python 3. It is based upon earlier work 
+by Steve Lowenthal and uses the open source Apache Cassandra CQLSH library.
 
 License
 =======
