@@ -9,7 +9,7 @@ To install:
 
 To configure the Cassandra host or IP address:
 
-    python -m cqljupyter.install  [<cassandra hostname>] [--ssl]
+    python -m cqljupyter.install  [<hostname> <port>] [--ssl]
 
 You can always rerun the above command to change the hostname. It's
 best to restart Jupyter after running it. You can often get away with closing
