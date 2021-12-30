@@ -1,7 +1,20 @@
-__pycache__
-*.pyc
-*.iml
-.idea/
+.*
+!.gitignore
+!.travis.yml
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
 build/
+develop-eggs/
 dist/
-MANIFEST
+downloads/
+eggs/
+*.egg-info/
+*.egg
+
+# Environments
+venv/
