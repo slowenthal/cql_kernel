@@ -24,7 +24,7 @@ In the notebook interface, select **CQL** from the **New** menu
 
 To run the sample CQL:
 
-    jupyter notebook Sample.ipydb
+    jupyter notebook Sample.ipynb
 
 Syntax
 ======
