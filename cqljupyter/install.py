@@ -5,10 +5,18 @@ import sys
 from jupyter_client.kernelspec import install_kernel_spec
 from IPython.utils.tempdir import TemporaryDirectory
 
+DEFAULT_HOST = '127.0.0.1'
+DEFAULT_PORT = 9042
+
 if len(sys.argv) > 1:
     hostname = sys.argv[1]
 else:
-    hostname = 'localhost'
+    hostname = DEFAULT_HOST
+
+if len(sys.argv) > 2:
+    port = sys.argv[2]
+else:
+    port = DEFAULT_PORT
 
 if ('--ssl' in sys.argv):
     ssl = "True"
@@ -19,7 +27,7 @@ kernel_json = {"argv": [sys.executable, "-m", "cqljupyter", "-f", "{connection_f
                "display_name": "CQL",
                "language": "CQL",
                "codemirror_mode": "sql",
-               "env": {"CASSANDRA_HOSTNAME": hostname, "SSL": ssl}
+               "env": {"CASSANDRA_HOSTNAME": hostname, "CASSANDRA_PORT" : port, "SSL": ssl}
                }
 
 
@@ -30,7 +38,7 @@ def install_my_kernel_spec(user=True, ssl=False):
             json.dump(kernel_json, f, sort_keys=True)
         # TODO: Copy resources once they're specified
 
-        print(f'Installing IPython kernel spec to connect to cassandra host {hostname} ssl={ssl}')
+        print(f'Installing IPython kernel spec to connect to cassandra host {hostname} port {port} ssl={ssl}')
         install_kernel_spec(td, 'CQL', user=user, replace=True)
 
 
