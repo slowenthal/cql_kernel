@@ -12,7 +12,7 @@ from cqlshlib import cql3handling
 from .cqlsh import Shell
 import re
 
-__version__ = '0.9'
+__version__ = '1.0.0'
 
 version_pat = re.compile(r'version (\d+(\.\d+)+)')
 
