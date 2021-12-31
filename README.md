@@ -45,12 +45,12 @@ Build
 =====
 Build using:
 
-    python setup.py sdist
+    python -m build
 
 Implementation Notes
 ====================
 
-1.  The file cqlsh.py was ported from 3.11 and converted using 2to3 to python3
+1.  The script cqlsh.py was ported from 3.11 and converted using 2to3 to python3
     syntax
 
     <https://github.com/apache/cassandra/blob/cassandra-3.11.10/bin/cqlsh.py>
