@@ -1,7 +1,10 @@
 import io
 import os
 from ipykernel.kernelbase import Kernel
+
 from cassandra.cluster import Cluster
+from cassandra.auth import PlainTextAuthProvider
+
 from ssl import SSLContext, PROTOCOL_TLSv1_2
 
 # from cqlsh import setup_cqlruleset
@@ -12,7 +15,7 @@ from cqlshlib import cql3handling
 from .cqlsh import Shell
 import re
 
-__version__ = '1.0.0'
+__version__ = '1.0.1'
 
 version_pat = re.compile(r'version (\d+(\.\d+)+)')
 
@@ -35,18 +38,27 @@ class CQLKernel(Kernel):
         Kernel.__init__(self, **kwargs)
         self.hostname = os.environ.get('CASSANDRA_HOSTNAME', 'localhost')
         self.port = int(os.environ.get('CASSANDRA_PORT', "9042"))
-        self.ssl = os.environ.get('SSL') == "True"
+        self.user = os.environ.get('CASSANDRA_USER')
+        self.pwd = os.environ.get('CASSANDRA_PWD')
+        self.ssl = os.environ.get('CASSANDRA_SSL') == "True"
         self._start_cql()
 
     def _start_cql(self):
         print(f"INFO ssl {self.ssl}")
+        if self.user:
+            auth_provider = PlainTextAuthProvider(username=self.user, password=self.pwd)
+        else:
+            auth_provider = None
+
         if self.ssl:
             c = Cluster([self.hostname], port=self.port, ssl_context=SSLContext(PROTOCOL_TLSv1_2))
         else:
-            c = Cluster([self.hostname])
+            c = Cluster([self.hostname], auth_provider=auth_provider)
+
         # ssl_options=sslhandling.ssl_settings(hostname, CONFIG_FILE) if ssl else None
 
-        self.cqlshell = Shell(self.hostname, self.port, use_conn=c)
+        print("about to connect ", self.user, self.pwd, flush=True)
+        self.cqlshell = Shell(self.hostname, self.port, username=self.user, password=self.pwd,  use_conn=c)
         self.cqlshell.use_paging = False
         self.outStringWriter = io.StringIO()
         self.cqlshell.query_out = self.outStringWriter

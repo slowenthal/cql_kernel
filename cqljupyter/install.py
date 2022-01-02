@@ -1,44 +1,26 @@
-import json
 import os
 import sys
+import json
+import argparse
 
 from jupyter_client.kernelspec import install_kernel_spec
 from IPython.utils.tempdir import TemporaryDirectory
-
-DEFAULT_HOST = '127.0.0.1'
-DEFAULT_PORT = 9042
-
-if len(sys.argv) > 1:
-    hostname = sys.argv[1]
-else:
-    hostname = DEFAULT_HOST
-
-if len(sys.argv) > 2:
-    port = sys.argv[2]
-else:
-    port = DEFAULT_PORT
-
-if ('--ssl' in sys.argv):
-    ssl = "True"
-else:
-    ssl = "False"
 
 kernel_json = {"argv": [sys.executable, "-m", "cqljupyter", "-f", "{connection_file}"],
                "display_name": "CQL",
                "language": "CQL",
                "codemirror_mode": "sql",
-               "env": {"CASSANDRA_HOSTNAME": hostname, "CASSANDRA_PORT" : port, "SSL": ssl}
+               "env" : {}
                }
 
 
-def install_my_kernel_spec(user=True, ssl=False):
+def install_my_kernel_spec(user=True):
     with TemporaryDirectory() as td:
         os.chmod(td, 0o755)  # Starts off as 700, not user readable
         with open(os.path.join(td, 'kernel.json'), 'w') as f:
             json.dump(kernel_json, f, sort_keys=True)
         # TODO: Copy resources once they're specified
 
-        print(f'Installing IPython kernel spec to connect to cassandra host {hostname} port {port} ssl={ssl}')
         install_kernel_spec(td, 'CQL', user=user, replace=True)
 
 
@@ -50,9 +32,29 @@ def _is_root():
 
 
 def main(argv):
-    user = '--user' in argv or not _is_root()
-    ssl = '--ssl' in argv
-    install_my_kernel_spec(user=user, ssl=ssl)
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('host', nargs='?')
+    parser.add_argument('port', nargs='?')
+    parser.add_argument('-u', type=str)
+    parser.add_argument('-p', type=str)
+    parser.add_argument('--ssl', action='store_true')
+    args = parser.parse_args()
+
+    kernel_json['env']['CASSANDRA_SSL']=str(args.ssl)
+    if (args.host):
+        kernel_json['env']['CASSANDRA_HOSTNAME']=args.host
+    if (args.port):
+        kernel_json['env']['CASSANDRA_PORT']=args.port
+    if (args.u):
+        kernel_json['env']['CASSANDRA_USER']=args.u
+    if (args.p):
+        kernel_json['env']['CASSANDRA_PWD']=args.p
+
+    user = args.u if args.u else not _is_root()
+    print(f'Installing IPython kernel spec to connect to cassandra ', kernel_json['env'])
+
+    install_my_kernel_spec(user=user)
 
 
 if __name__ == '__main__':
