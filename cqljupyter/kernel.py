@@ -15,7 +15,7 @@ from cqlshlib import cql3handling
 from .cqlsh import Shell
 import re
 
-__version__ = '1.0.1'
+__version__ = '1.0.2'
 
 version_pat = re.compile(r'version (\d+(\.\d+)+)')
 
@@ -58,7 +58,7 @@ class CQLKernel(Kernel):
         # ssl_options=sslhandling.ssl_settings(hostname, CONFIG_FILE) if ssl else None
 
         print("about to connect ", self.user, self.pwd, flush=True)
-        self.cqlshell = Shell(self.hostname, self.port, username=self.user, password=self.pwd,  use_conn=c)
+        self.cqlshell = Shell(self.hostname, self.port, username=self.user, password=self.pwd,  ssl=self.ssl)
         self.cqlshell.use_paging = False
         self.outStringWriter = io.StringIO()
         self.cqlshell.query_out = self.outStringWriter
@@ -119,11 +119,6 @@ class CQLKernel(Kernel):
 
             self.send_response(self.iopub_socket, 'execute_result', stream_content)
 
-        # if exitcode:
-        #     return {'status': 'error', 'execution_count': self.execution_count,
-        #             'ename': '', 'evalue': str(exitcode), 'traceback': []}
-        # else:
-
         return {'status': 'ok', 'execution_count': self.execution_count,
                 'payload': [], 'user_expressions': {}}
 
@@ -133,10 +128,6 @@ class CQLKernel(Kernel):
         default = {'matches': [], 'cursor_start': 0,
                    'cursor_end': cursor_pos, 'metadata': dict(),
                    'status': 'ok'}
-
-        # if not code or code[-1] == ' ':
-        #     return default
-        #
 
         # Find the rightmost of blank, . , <, (
 
