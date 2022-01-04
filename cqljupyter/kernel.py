@@ -1,19 +1,12 @@
 import io
 import os
+import sys
+import re
 from ipykernel.kernelbase import Kernel
 
-from cassandra.cluster import Cluster
-from cassandra.auth import PlainTextAuthProvider
-
-from ssl import SSLContext, PROTOCOL_TLSv1_2
-
-# from cqlsh import setup_cqlruleset
-import sys
 from . import cqlsh
 from cqlshlib import cql3handling
-
 from .cqlsh import Shell
-import re
 
 __version__ = '1.0.2'
 
@@ -44,20 +37,6 @@ class CQLKernel(Kernel):
         self._start_cql()
 
     def _start_cql(self):
-        print(f"INFO ssl {self.ssl}")
-        if self.user:
-            auth_provider = PlainTextAuthProvider(username=self.user, password=self.pwd)
-        else:
-            auth_provider = None
-
-        if self.ssl:
-            c = Cluster([self.hostname], port=self.port, ssl_context=SSLContext(PROTOCOL_TLSv1_2))
-        else:
-            c = Cluster([self.hostname], auth_provider=auth_provider)
-
-        # ssl_options=sslhandling.ssl_settings(hostname, CONFIG_FILE) if ssl else None
-
-        print("about to connect ", self.user, self.pwd, flush=True)
         self.cqlshell = Shell(self.hostname, self.port, username=self.user, password=self.pwd,  ssl=self.ssl)
         self.cqlshell.use_paging = False
         self.outStringWriter = io.StringIO()
@@ -66,9 +45,6 @@ class CQLKernel(Kernel):
 
         cqlsh.setup_cqlruleset(cql3handling)
         cqlsh.setup_cqldocs(cql3handling)
-
-        # cql3handling
-        pass
 
     def do_execute(self, code, silent, store_history=True,
                    user_expressions=None, allow_stdin=False):
