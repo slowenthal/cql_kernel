@@ -57,10 +57,9 @@ Implementation Notes
 
     ToDo: upgrade to Cassandra 4.0 cqlsh
 
-For details of how this works, see the Jupyter docs on
-* [wrapper kernels](http://jupyter-client.readthedocs.org/en/latest/wrapperkernels.html),
+For details of how this works, see these Jupyter docs:
+* [Making simple Python wrapper kernels](http://jupyter-client.readthedocs.org/en/latest/wrapperkernels.html)
 * [Making kernels for Jupyter](https://jupyter-client.readthedocs.io/en/stable/kernels.html)
-* Pexpect's docs on the [replwrap module](http://pexpect.readthedocs.org/en/latest/api/replwrap.html)
 
 Author
 ======
