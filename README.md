@@ -1,5 +1,5 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Downloads](https://pepy.tech/badge/cqljupyter)](https://pepy.tech/project/cqljupyer)
+[![Downloads](https://pepy.tech/badge/cqljupyter)](https://pepy.tech/project/cqljupyter)
 [![PyPI version](https://badge.fury.io/py/cqljupyter.svg)](https://badge.fury.io/py/cqljupyter)
 
 A Jupyter kernel for Apache Cassandra
