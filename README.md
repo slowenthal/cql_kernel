@@ -50,14 +50,11 @@ Build using:
 Implementation Notes
 ====================
 
-1.  The cqlsh.py script was ported from 3.11 and converted using 2to3 to python3
-    syntax
+1.  The cqlsh.py v6.1.0 script was copied from Apache Cassandra 4.1
 
-    <https://github.com/apache/cassandra/blob/cassandra-3.11.10/bin/cqlsh.py>
+    <https://github.com/apache/cassandra/blob/trunk/bin/cqlsh.py>
 
-    ToDo: upgrade to Cassandra 4.0 cqlsh
-
-For details of how this works, see these Jupyter docs:
+For details of how Jupyter kernels work, see these references:
 * [Making simple Python wrapper kernels](http://jupyter-client.readthedocs.org/en/latest/wrapperkernels.html)
 * [Making kernels for Jupyter](https://jupyter-client.readthedocs.io/en/stable/kernels.html)
 

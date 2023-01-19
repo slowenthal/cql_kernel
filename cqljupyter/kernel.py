@@ -8,7 +8,7 @@ from . import cqlsh
 from cqlshlib import cql3handling
 from .cqlsh import Shell
 
-__version__ = '1.0.3'
+__version__ = '1.1.0'
 
 version_pat = re.compile(r'version (\d+(\.\d+)+)')
 
